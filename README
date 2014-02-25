@@ -1,0 +1,97 @@
+********************************************************************************
+MUSer2 (MUS extractor v2): an MUS and group-MUS extraction tool.
+
+MUSer2 is an MUS and group-MUS extraction tool that implements hybrid MUS 
+extraction algorithm HYB [1] enhanced with Recursive Model Rotation (RMR) [2]. 
+Most of the theory behind the tool is presented in
+
+[1] J. Marques-Silva and I. Lynce (2011) On Improving MUS Extraction Algorithms.
+In: Proc. SAT 2011, pp. 159-173
+
+[2] A. Belov and J. Marques-Silva (2011) Accelerating MUS Extraction with 
+Recursive Model Rotation. In: Proc. FMCAD 2011, pp. 37-40
+
+This source code release is under the GNU General Public License Version 3. See 
+COPYING for more details. In essence you are only allowed to distribute a modified 
+version of MUSer2 (resp. a program that uses MUSer2) if you make the sources of 
+your modifications (resp. the program that uses MUSer2) under GPL as well.
+
+Release identification: changeset 1097:62b20d49496c, date 2012-07-06
+
+MUSer2 is copyright Anton Belov and Joao Marques-Silva. If you need another 
+license please contact us at [anton.belov,jpms]@ucd.ie. 
+
+Please contact Anton Belov (anton.belov@ucd.ie) in case of bugs or questions.
+
+Web: http://logos.ucd.ie/web/doku.php?id=muser
+
+MUSer2 can use a number of different SAT solvers as a back-end. The current 
+source code release comes with a wrapper for Minisat 2.2. 
+
+1. Minisat 2.2
+   N. Een and N. Sörensson (2003) An Extensible SAT-solver. In: Proc. SAT 2003.
+   N. Een and A. Biere (2005) Effective Preprocessing in SAT through Variable 
+   and Clause Elimination. In: Proc. SAT 2005. 
+
+There will be soon an update for picosat and lingeling.
+
+********************************************************************************
+Compilation:
+
+This source code release is a snapshot of a subset of a large research framework
+called BOLT, developed by J. Marques-Silva and collaborators. As such the directory 
+structure and the compilation process is slightly more involved than required for
+MUSer2. Some of the more recent parts of MUSer2 are written in C++11, as such 
+gcc 4.7 or later is required to compile the tool.
+
+To compile:
+
+cd ./src/tools/muser-2
+make
+
+To clean up all directories:
+
+cd ./src/tools/muser-2
+make allclean
+
+To rebuild dependencies:
+
+cd into directory you want to rebuild for
+make deps
+
+The key file for compilation tweaks is ./src/mkcfg/makefile-common-defs
+
+Compilation options:
+
+make mkm=prof -- profiling build
+make mkm=val  -- optimized, with debug symbols
+make mkm=ass  -- optimized, with assertions enabled
+make mkm=chk  -- checked build
+make mkm=dbg  -- debug build
+
+make static=1 -- build a statically linked executable
+make m32=1    -- build a 32-bit executable instead of 64-bit (not on Mac)
+
+********************************************************************************
+Usage:
+
+muser-2 -- display all available options
+
+muser-2 [options] input.cnf       -- for MUS extraction  
+
+muser-2 -grp [options] input.gcnf -- for group-MUS extraction
+
+Usage: run-muser2 [options] input.cnf       -- for MUS extraction  
+       run-muser2 -grp [options] input.gcnf -- for group-MUS extraction
+
+Input files may be gzipped (in which case the extension .gz should be appended
+to the file name).
+
+
+********************************************************************************
+Authors:
+
+Anton Belov (anton.belov@ucd.ie) -- MUSer2.
+Joao Marques-Silva (joao.marques-silva@ucd.ie) -- BOLT, initial version of MUSer.
+
+Please contact Anton Belov (anton.belov@ucd.ie) in case of bugs or questions.

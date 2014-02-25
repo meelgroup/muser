@@ -1,0 +1,10 @@
+cl_id_manager.o: cl_id_manager.cc cl_id_manager.hh \
+ ../../src/include/globals.hh ../../src/include/macros.hh \
+ ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
+ ../../src/include/types.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh
+cl_registry.o: cl_registry.cc cl_registry.hh ../../src/include/globals.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/err_utils.hh ../../src/include/rusage.hh \
+ basic_clause.hh cl_id_manager.hh cl_functors.hh cl_types.hh

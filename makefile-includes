@@ -1,0 +1,25 @@
+### makefile-includes --- 
+
+#-------------------------------------------------------------------------------
+# Basic definition variables (may be extended in each Makefile)
+#-------------------------------------------------------------------------------
+
+# Must set ROOT elsewhere
+PROJ	  = bolt
+SRCDIR    = $(ROOT)/src
+DISTNAME  = dist
+DISTDIR   = $(ROOT)/dist
+RELNAME   = release
+RELDIR    = $(ROOT)/release
+MKDIR     = $(SRCDIR)/mkcfg
+SCRIPTDIR = $(SRCDIR)/scripts
+UTILDIR   = $(SRCDIR)/utils
+TOOLDIR   = $(SRCDIR)/tools
+EXTDIR    = $(SRCDIR)/extsrc
+EXTUTILDIR = $(SRCDIR)/extutil
+
+BUILDDATE = $(shell date +'%Y-%b-%d %R')
+
+#-------------------------------------------------------------------------------
+
+### makefile-include ends here

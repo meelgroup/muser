@@ -1,0 +1,29 @@
+solver_factory.o: solver_factory.cc solver_config.hh \
+ ../../src/idman/id_manager.hh ../../src/include/globals.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/err_utils.hh ../../src/include/rusage.hh \
+ solver_factory.hh solver_wrapper.hh ../../src/clset/basic_clset.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_id_manager.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_registry.hh ../../src/mus-2/basic_group_set.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/cl_types.hh ../../src/clset/cl_registry.hh \
+ ../../src/mus-2/mus_config.hh solver_config.hh \
+ ../../src/mus-2/occs_list.hh ../../src/mus-2/basic_group_set.hh \
+ solver_utils.hh ../../src/extsrc/minisat22-2/minisat22_wrapper_gincr.hh \
+ solver_wrapper_gincr.hh solver_wrapper.hh \
+ ../../src/extsrc/minisat22-2/../minisat22-2/core/Solver.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/mtl/Vec.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/mtl/IntTypes.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/mtl/XAlloc.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/mtl/Heap.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/mtl/Alg.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/utils/Options.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/utils/ParseUtils.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/core/SolverTypes.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/mtl/Map.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/mtl/Alloc.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/simp/SimpSolver.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/mtl/Queue.h \
+ ../../src/extsrc/minisat22-2/../minisat22-2/core/Solver.h

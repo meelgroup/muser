@@ -1,0 +1,362 @@
+### makefile-common-defs --- 
+
+## Author: jpms
+## Version: $Id: makefile-common-defs 73 2007-07-26 15:16:48Z jpms $
+## Keywords: 
+## X-URL: 
+
+#-------------------------------------------------------------------------------
+# Basic definition variables (may be extended in each Makefile)
+#-------------------------------------------------------------------------------
+
+CC         = gcc -std=c++11
+CXX	   = g++ -std=c++11
+
+# Redefine build date (for CCM compilation mode (due to bug with ccmalloc)
+ifeq ($(mkm), ccm)
+BUILDDATE = $(shell date +'%Y-%b-%d-%R')    # Minor bug with ccmalloc
+endif
+
+MKDATE = $(shell date +'%Y%m%d')
+
+# Platform
+UNAME := $(shell uname)
+
+YACCF      = $(basename $(wildcard *.y))
+YCSRC      =
+ifneq ($(YACCF), )
+  YCSRC = $(YACCF).tab.c
+endif
+LEXF       = $(basename $(wildcard *.l))
+LCSRC      =
+ifneq ($(LEXF), )
+  LCSRC = lex.$(LEXF).c
+endif
+CXXSRCS    = $(wildcard *.cc)
+CXXHDRS    = $(wildcard *.hh)
+CCSRCS     = $(wildcard *.c)
+CCHDRS     = $(wildcard *.h)
+SRCS       = $(YCSRC) $(LCSRC) $(CXXSRCS) $(CCSRCS)
+OBJS       = $(addsuffix .o, $(basename $(SRCS)))
+OBJS	   := $(EXTOBJS) $(OBJS)
+
+
+# If not on Mac OS X and asked for 32 bits, tweak
+ifeq (, $(findstring Darwin, $(UNAME)))
+     ifeq ($(m32), 1)
+          CPPFLAGS += -m32
+          LLIBS += -L/usr/lib32
+     endif
+endif
+
+LLIBS += -L/usr/lib
+LLIBS += -L/opt/local/lib -L/sw/lib
+LLIBS += -L.
+
+IDIRS += -I$(ROOT)/src/extutil/include
+LLIBS += -L$(ROOT)/src/extutil/lib
+
+IDIRS += $(foreach l,$(INCS),-I$(SRCDIR)/$l)
+
+IDIRS += $(foreach l,$(EXTINCS),-I$(EXTDIR)/$l)
+
+IDIRS += $(foreach l,$(PARSEINCS),-I$(SRCDIR)/parse/$l)
+
+IDIRS += $(foreach l,$(LIBINCS),-I$(SRCDIR)/libs/$l)
+
+IDIRS += $(foreach l,$(PARSELIBS),-I$(SRCDIR)/parse/$l)
+LLIBS += $(foreach l,$(PARSELIBS),-l$l)
+LLIBDIRS += $(foreach l,$(PARSELIBS),-L$(SRCDIR)/parse/$l)
+
+IDIRS += $(foreach l,$(LIBLIBS),-I$(SRCDIR)/libs/$l)
+LLIBS += $(foreach l,$(LIBLIBS),-l$l)
+LLIBDIRS += $(foreach l,$(LIBLIBS),-L$(SRCDIR)/libs/$l)
+
+IDIRS += $(foreach l,$(LIBS),-I$(SRCDIR)/$l)
+LLIBS += $(foreach l,$(LIBS),-l$l)
+LLIBDIRS += $(foreach l,$(LIBS),-L$(SRCDIR)/$l)
+
+IDIRS += $(foreach l,$(EXTERNALLIBS),-I$(EXTDIR)/$l)
+LLIBS += $(foreach l,$(EXTERNALLIBS),-l$l)
+LLIBDIRS += $(foreach l,$(EXTERNALLIBS),-L$(EXTDIR)/$l)
+
+IDIRS += $(foreach l,$(EXTRALIBS),-I$(SRCDIR)/$l)
+LLIBS += $(foreach l,$(EXTRALIBS),-l$l)
+LLIBDIRS += $(foreach l,$(EXTRALIBS),-L$(SRCDIR)/$l)
+
+# For Mac OS X, linking is dynamic; otherwise it is static
+ifeq (, $(findstring Darwin, $(UNAME)))
+        LNKTYPE = -static
+else
+#       For Mac OS X, select the LLP64 data model
+	CPPFLAGS += -arch x86_64
+endif
+
+# Tweak for MUSer2: by default the linking is always dynamic (b/c of picosat), 
+# unless specifically asked for static
+ifeq ($(XTRGT), muser-2)
+     LNKTYPE = 
+     ifeq ($(static), 1)
+          LNKTYPE = -static
+     endif             
+endif
+
+# Decide which libraries to include
+ifeq ($(findstring gmp, $(xl)), gmp)
+	LLIBS += -lgmpxx -lgmp
+	CPPFLAGS += -DGMPDEF
+endif
+
+# Define trace mode
+ifneq ($(tm),)
+  CPPFLAGS    += -DTRACEVERB=$(tm)
+else
+  CPPFLAGS    += -DTRACEVERB=0
+endif
+
+# Define make mode
+ifeq ($(mkm), prof)
+  CPPFLAGS    += -pg -O3 -fno-inline -DNDEBUG -DNCHECK 
+else
+  ifeq ($(mkm), val)
+    CPPFLAGS    += -ggdb3 -O3 -DNDEBUG -DNCHECK 
+  else
+    ifeq ($(mkm), ccm)
+      CPPFLAGS  += -ggdb3 -UNCHECK -UNDEBUG
+    else
+      ifeq ($(mkm), chk)
+        CPPFLAGS  += -ggdb3 -UNCHECK -UNDEBUG
+      else
+        ifeq ($(mkm), dbg)
+          CPPFLAGS  += -ggdb3 -DFULLDEBUG -UNDEBUG -UNCHECK
+        else
+          ifeq ($(mkm), sts)
+		CPPFLAGS += -O3 -DNDEBUG -DNCHECK -DSTATISTICS
+          else
+            ifeq ($(mkm), ass) # enable assertions only and keep symbols
+                CPPFLAGS += -ggdb3 -UNDEBUG -DNCHECK
+            else # default
+		CPPFLAGS  += -O3 -DNDEBUG -DNCHECK
+          endif
+        endif
+      endif
+    endif
+  endif
+endif
+endif
+
+LNKFLAGS += $(LLIBDIRS) $(LLIBS) $(LFLAGS)
+
+# Compilation tweaks/silencers
+CPPFLAGS += -Wall -Wno-deprecated
+
+# other flags
+CPPFLAGS += -DBUILDDATE='"$(BUILDDATE)"' -DTOOLNAME='"$(XTRGT)"'
+
+# By default must include global defs
+CPPFLAGS += -I. -I$(SRCDIR)/include -I$(SRCDIR)/stubs $(IDIRS)
+
+
+#-------------------------------------------------------------------------------
+# Make a object files
+#-------------------------------------------------------------------------------
+
+obj: $(SRCS) $(OBJS)
+
+
+#-------------------------------------------------------------------------------
+# Make a lib
+#-------------------------------------------------------------------------------
+
+lib: lib$(TRGT).a
+
+lib$(TRGT).a: $(SRCS) $(OBJS)
+	@-rm -f lib$(TRGT).a
+	@echo Creating lib: $@
+	@ar cr $@ *.o
+
+
+#-------------------------------------------------------------------------------
+# Make an executable
+#-------------------------------------------------------------------------------
+
+exec: $(OBJS) $(XTRGT)
+	@echo $(LLIBS)
+
+$(XTRGT): libs parselibs liblibs extralibs externallibs $(XTRGT).o
+ifeq ($(mkm), val)
+	@$(CXX) $(CPPFLAGS) -o $@ $@.o $(LNKFLAGS)           # *dynamic* linkage
+else
+ifeq ($(mkm), ccm)
+	@$(CCMALLOC) $(CXX) $(CPPFLAGS) -o $@ $@.o $(LNKFLAGS) # dynamic linkage
+else
+#	@$(CXX) $(CPPFLAGS) -static -o $@ $@.o $(LNKFLAGS)
+#	$(CXX) $(CPPFLAGS) -o $@ $@.o $(LNKFLAGS)
+	$(CXX) $(CPPFLAGS) $(LNKTYPE) -o $@ $(OBJS) $(LNKFLAGS)
+ifeq ($(mkm), opt)
+	@strip $(XTRGT)
+endif
+endif
+endif
+
+
+#-------------------------------------------------------------------------------
+# Make libs
+#-------------------------------------------------------------------------------
+
+libs:
+	for f in $(LIBS); do \
+		(cd $(SRCDIR)/$$f; make mkm=$(mkm) lib); \
+	done
+
+parselibs:
+	for f in $(PARSELIBS); do \
+		(cd $(SRCDIR)/parse/$$f; make mkm=$(mkm) lib); \
+	done
+
+liblibs:
+	for f in $(LIBLIBS); do \
+		(cd $(SRCDIR)/libs/$$f; make mkm=$(mkm) lib); \
+	done
+
+extralibs:
+	for f in $(EXTRALIBS); do \
+		(cd $(SRCDIR)/$$f; make mkm=$(mkm) lib); \
+	done
+
+externallibs:
+	for f in $(EXTERNALLIBS); do \
+		(cd $(EXTDIR)/$$f; make mkm=$(mkm) lib); \
+	done
+
+
+#-------------------------------------------------------------------------------
+# Unit testing
+#-------------------------------------------------------------------------------
+
+ut:	LNKFLAGS+=-L$(EXTDIR)/CppUnitLite -lCppUnitLite
+
+ut:	CPPFLAGS+=-D__UNIT_TEST__ -I$(EXTDIR)/CppUnitLite
+
+ut: utclean libs extralibs parselibs liblibs externallibs $(OBJS)
+	@echo Generating: $@
+#	@echo $(OBJS)
+	$(CXX) $(CPPFLAGS) -o $@ $(OBJS) $(LNKFLAGS)
+#	@./ut
+#	@make utclean
+
+
+#-------------------------------------------------------------------------------
+# Dependencies
+#-------------------------------------------------------------------------------
+
+deps: $(SRCS)
+#	echo "IDIRS: $(IDIRS)"
+	@rm -f Makefile.dependencies
+	@touch Makefile.dependencies
+	for f in $(SRCS); do \
+		$(CXX) $(CPPFLAGS) -MM $$f >> Makefile.dependencies; \
+	done
+#		$(CXX) $(CPPFLAGS) -MM $$f >> Makefile.dependencies;\
+#		$(CXX) $(CPPFLAGS) -M $$f >> Makefile.dependencies; \
+
+
+#-------------------------------------------------------------------------------
+# External utils
+#-------------------------------------------------------------------------------
+
+extutil: extutilclean
+	@(cd $(EXTUTILDIR); make all)
+
+extutilclean:
+	@(cd $(EXTUTILDIR); make utilclean)
+
+
+#-------------------------------------------------------------------------------
+# Help
+#-------------------------------------------------------------------------------
+
+help:
+	@echo ""
+	@echo "'make deps': generates dependency files"
+	@echo "'make exedist': creates a binary distribution, placed in the $(ROOT)/dist directory"
+	@echo "'make allclean': cleans object and executable files associated with a target"
+	@echo "'make clean': cleans object files associated with a target"
+	@echo "'make [all]': builds a tool. Available options:"
+	@echo "     mkm='XXX', where XXX is one of opt,chk,dbg,ccm,val,prof"
+	@echo "Notes:"
+	@echo "  mkm: compile mode, chk(CHECK), dbg(DEBUG), prof(PROFILE), etc"
+	@echo ""
+
+
+#-------------------------------------------------------------------------------
+# Cleanup
+#-------------------------------------------------------------------------------
+
+clean:
+	@rm -f $(OBJS)
+
+libclean:
+	@rm -f lib$(TRGT).a
+
+utclean: clean
+	@rm -f ut
+
+dirallclean: clean libclean utclean
+
+parseallclean: dirallclean
+	@rm -f lex.*.[ch] *.tab.[ch]
+
+allclean: dirallclean
+ifneq ($(XTRGT), )
+	@-/bin/rm -f $(XTRGT)
+endif
+	for f in $(LIBS); do \
+		(cd $(SRCDIR)/$$f; make dirallclean); \
+	done
+	for f in $(EXTRALIBS); do \
+		(cd $(SRCDIR)/$$f; make dirallclean); \
+	done
+	for f in $(PARSELIBS); do \
+		(cd $(SRCDIR)/parse/$$f; make parseallclean); \
+	done
+	for f in $(LIBLIBS); do \
+		(cd $(SRCDIR)/libs/$$f; make dirallclean); \
+	done
+# jpms: external libs must be clean locally to each one
+	for f in $(EXTERNALLIBS); do \
+		(cd $(EXTDIR)/$$f; make dirallclean); \
+	done
+
+
+#-------------------------------------------------------------------------------
+# Rules
+#-------------------------------------------------------------------------------
+
+%.o:     %.cc
+	@echo Compiling: $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+%.o:     %.c
+	@echo Compiling: $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+%.tab.c: %.y
+	@echo "Updating yacc..."
+	bison -p $(*F) -d -o $(*F).tab.c $<
+
+lex.%.c: %.l
+	@echo "Updating lex..."
+	flex -P$(*F) -olex.$(*F).c $<
+
+
+#-------------------------------------------------------------------------------
+# Include dependencies
+#-------------------------------------------------------------------------------
+
+-include Makefile.dependencies
+
+
+#-------------------------------------------------------------------------------
+
+### makefile-common-defs ends here

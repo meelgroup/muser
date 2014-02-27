@@ -1,13 +1,51 @@
-### README
+### README @ Nov 28, 2012
 
-This directory is for various APIs for our tools.
+MUSer2 API (c) Anton Belov, 2012-14
 
-An API will typically consist of a single header file together with a library --
-these can be distributed to end users so that they can properly integrate our tools 
-into theirs (i.e. without shell scripts). As such the headers should be clean, and
-independent of other BOLT headers (since those do change on regular basis, and often
-contain a lot of implementation details). All the BOLT-specific details can be 
-hidden into the "implementation" class, which defined in the library, and just
-forward-declared in the user-accessible header. See muser2_api for an example.
+APPOLOGY: the library provides only a very basic interface; please feel free to
+extend.
 
-## Author:   antonb
+Basic instructions
+-------------------
+
+Compile with 'make apilib' -- this will create a static library libmuser2_api.a. 
+If you find that the library is too bulky for your taste, remove some of the
+SAT solvers compiled in. This can be done by going into src/wraps directory, 
+and modifying its Makefile, as well as hiding the unnecessary wrappers sources
+prior to rebuiling wraps. Once this is done, rebuild the API library.
+
+The library can now be linked into any application (-lmuser2_api).
+
+The interface to the library is declared in two headers (which should be 
+distributed together with the library): muser2_api.h and muser2_api.hh. 
+The former defines C-interface, the latter C++.
+
+Roughly, the application will do something along these lines:
+
+#include "muser2_api.hh"
+
+....
+
+MUSer2 m;
+
+m.init_all();
+
+MUSer2::Gid g1 = m.add_clause(...)
+MUSer2::Gid g2 = m.add_clause(...)
+
+m.init_run();
+m.compute_mus();
+m.reset_run();
+
+const std::vector<Gid>& mus = m.gmus_gids();
+
+m.reset_all();
+
+...
+
+The documentation and examples will be created at some point, meanwhile email
+anton@belov-mcdowell.com
+
+
+
+  

@@ -1,57 +1,83 @@
 ********************************************************************************
 MUSer2 (MUS extractor v2): an MUS and group-MUS extraction tool.
+----------------------------------------------------------------
 
-MUSer2 is an MUS and group-MUS extraction tool that implements hybrid MUS 
-extraction algorithm HYB [1] enhanced with Recursive Model Rotation (RMR) [2]. 
-Most of the theory behind the tool is presented in
+MUSer2 is an MUS/group-MUS/MES/group-MES/VMUS/VGMUS extraction framework that
+implements many different algorithms for the computation of the above, and is
+designed for (relative) ease of trying out and experimenting with new ideas. 
 
-[1] J. Marques-Silva and I. Lynce (2011) On Improving MUS Extraction Algorithms.
-In: Proc. SAT 2011, pp. 159-173
-
-[2] A. Belov and J. Marques-Silva (2011) Accelerating MUS Extraction with 
-Recursive Model Rotation. In: Proc. FMCAD 2011, pp. 37-40
+The list of references at the end of this README provides pointers to the 
+descriptions of various algorithms and techniques used in MUSer2. Please cite 
+[X] if you use MUSer2 in your research work.
 
 This source code release is under the GNU General Public License Version 3. See 
-COPYING for more details. In essence you are only allowed to distribute a modified 
-version of MUSer2 (resp. a program that uses MUSer2) if you make the sources of 
-your modifications (resp. the program that uses MUSer2) under GPL as well.
+COPYING for more details. In essence you are only allowed to distribute a 
+modified version of MUSer2 (resp. a program that uses MUSer2) if you make the 
+sources of your modifications (resp. the program that uses MUSer2) under GPL as 
+well. If you need another license please contact us.
 
-Release identification: changeset 1097:62b20d49496c, date 2012-07-06
+MUSer2 is (c) 2010-2014 Anton Belov and Joao Marques-Silva.  
 
-MUSer2 is copyright Anton Belov and Joao Marques-Silva. If you need another 
-license please contact us at [anton.belov,jpms]@ucd.ie. 
+Please contact Anton Belov (anton@belov-mcdowell.com) in case of bugs or 
+questions.
 
-Please contact Anton Belov (anton.belov@ucd.ie) in case of bugs or questions.
+MUSer2 can use a number of different SAT solvers as a back-end. This source 
+release comes with wrappers and the source code of the following SAT solvers:
+(1) Glucose 3.0 by Gilles Audemard and Laurent Simon
+    http://www.labri.fr/perso/lsimon/glucose/
+(2) Minisat 2.2 by Niklas Een and Niklas Sorensson
+    http://http://minisat.se/  
+(3) Minisat GH: the up-to-date version of Minisat by Niklas Sorensson
+    https://github.com/niklasso/minisat
+(4) Minisat HMUC: the proof-tracing version of Minisat by Vadim Ryvchin
+    http://tx.technion.ac.il/~rvadim/index.html
+(5) Minisat ABBR: the abbreviating version of Minisat by Jean-Marie Lagniez
+    http://fmv.jku.at/lagniez/
+(6) PicoSAT v954 by Armin Biere
+    http://fmv.jku.at/picosat/
+(7) Lingeling ala by Armin Biere
+    http://fmv.jku.at/lingeling/        
+(8) UBCSAT 1.2 by Dave Tompkins
+    http://ubcsat.dtompkins.com/legal
+IMPORTANT: the SAT solvers included in this source release are under various
+open-source licences. If you use MUSer2, you are indirectly using at least one
+of these SAT solvers and it is YOUR responsibility to ensure that your use 
+abides by their licensing terms.
+       
+********************************************************************************
+DEPENDENCIES
 
-Web: http://logos.ucd.ie/web/doku.php?id=muser
+(1) Some of the code uses Boost Graph Library, as such you will need a 
+    header-only distribution of Boost. In case it is installed in a non-standard 
+    location, add a symlink to boost include directory to src/extutil/include
 
-MUSer2 can use a number of different SAT solvers as a back-end. The current 
-source code release comes with a wrapper for Minisat 2.2. 
-
-1. Minisat 2.2
-   N. Een and N. Sörensson (2003) An Extensible SAT-solver. In: Proc. SAT 2003.
-   N. Een and A. Biere (2005) Effective Preprocessing in SAT through Variable 
-   and Clause Elimination. In: Proc. SAT 2005. 
-
-There will be soon an update for picosat and lingeling.
+(2) As some of the code is written in C++11 gcc 4.7 or later is required to 
+    compile the tool.
+    
+(3) The experimental multi-threaded code (enabled only when mt=1 is passed to
+    make) requires Intel Thread Building Blocks (TBB) 3.0 libraries. Add a 
+    symlink called tbb30 to src/extutil directory. 
+    WARNING: the multi-threaded code has not been touched for over 2 years and 
+    is probably broken and inconsistent with the changes that have been made 
+    since then. It is not recommended to use it, and it will probably be removed
+    in the future.     
 
 ********************************************************************************
-Compilation:
+COMPILATION
 
 This source code release is a snapshot of a subset of a large research framework
-called BOLT, developed by J. Marques-Silva and collaborators. As such the directory 
-structure and the compilation process is slightly more involved than required for
-MUSer2. Some of the more recent parts of MUSer2 are written in C++11, as such 
-gcc 4.7 or later is required to compile the tool.
+called BOLT, developed by J. Marques-Silva and collaborators. As such the 
+directory structure and the compilation process is more involved than required 
+for MUSer2. Its also a bit fragile, and will, hopefully be fixed.
 
 To compile:
 
-cd ./src/tools/muser-2
+cd ./src/tools/muser2
 make
 
 To clean up all directories:
 
-cd ./src/tools/muser-2
+cd ./src/tools/muser2
 make allclean
 
 To rebuild dependencies:
@@ -78,37 +104,52 @@ make m32=1    -- build a 32-bit executable instead of 64-bit; you might need to
 make xm=xp    -- compile all the experimental code, i.e. anything under
                  #ifdef XPMODE in the source (use at your own risk)
 
-## NOTE: if you're running into weird problems it might be because there are 
-## symbols accross the static libraries. By default the linker will take the 
-## object code of the first one it sees and ignore the rest, and you will never 
-## know about it. Adding the code below, will make it to link in all of the
-## objects from each of the libraries, and so the linker will complain in case
-## there are dublicate symbols. 
-#ifeq (, $(findstring Darwin, $(UNAME)))
-#  LNKFLAGS += -Wl,--whole-archive $(LLIBDIRS) $(LLIBS) -Wl,--no-whole-archive
-#else
-#  LNKFLAGS += -Wl,-all_load $(LLIBDIRS) $(LLIBS)
-#endif
+make mt=1     -- include multi-threaded code (requires TBB); do not do it.
+
+make it       -- compile without checking non-local dependencies
+
+NOTE: if you're running into weird problems it might be because there are 
+symbols accross the static libraries. By default the linker will take the 
+object code of the first one it sees and ignore the rest, and you will never 
+know about it. There's a explaining how to deal with this in 
+src/mkcfg/makefile-common-defs
+
+This source distribution also includes a source code for a (thin) API that allows
+to link in and execute muser2 from other soft. The API is in src/api/muser2_api.
+See README in that directory for instructions.
 
 
 ********************************************************************************
-Usage:
+USAGE
 
-muser-2 -- display all available options
+muser2 -- display all available options and parameters. Please read the output
+          carefully. If something is unclear send us an email.
 
-muser-2 [options] input.cnf       -- for MUS extraction  
+Some examples:
 
-muser-2 -grp [options] input.gcnf -- for group-MUS extraction
+1. computation of a MUS:
 
-Usage: run-muser2 [options] input.cnf       -- for MUS extraction  
-       run-muser2 -grp [options] input.gcnf -- for group-MUS extraction
+muser2 ../examples/bitops0.cnf  
 
-Input files may be gzipped (in which case the extension .gz should be appended
-to the file name).
+2. computation of a group-MUS:
+
+muser2 -grp ../examples/bitops0.gcnf
+
+3. computation of a variable-MUS:
+
+muser2 -var ../examples/c499_gr_2pin_w5.shuffled.cnf.gz
+
+4. computation of an interesting-VMUS:
+
+muser2 -var -grp ../examples/b21_242.vgcnf.gz
+
+5. computation of an MES using chunking mode and specialized model rotation
+
+muser2 -irr -chunk 1000 -imr ../examples/bw_large.a.cnf
 
 
 ********************************************************************************
-Authors:
+AUTHORS
 
 Anton Belov (anton@belov-mcdowell.com) -- MUSer2.
 Joao Marques-Silva (joao.marques-silva@ucd.ie) -- BOLT, initial version of MUSer.
@@ -117,4 +158,28 @@ Contributors:
 
 Alessandro Previti
 
-Please contact Anton Belov (anton@belov-mcdowell.com) in case of bugs or questions.
+Please contact Anton Belov (anton@belov-mcdowell.com) in case of bugs or 
+questions.
+
+********************************************************************************
+MUSer2 REFERENCES
+
+[1] A. Belov and J. Marques-Silva, ÒMUSer2 : An Efficient MUS Extractor, System 
+    Description,Ó JSAT, 2012. 
+    * this is the tool paper for MUSer2.    
+[2] A. Belov, I. Lynce, and J. Marques-Silva, ÒTowards efficient MUS extractionÓ
+    AI Commun., 2012.
+    * hybrid algorithm, recursive model rotation
+[3] A. Belov, A. Ivrii, A. Matsliah, and J. Marques-silva, ÒOn Efficient 
+    Computation of Variable MUSes,Ó SAT-2012, 2012.
+    * variable MUSes
+[4] A. Belov, M. Janota, I. Lynce, and J. Marques-Silva, ÒOn Computing Minimal 
+    Equivalent Subformulas,Ó in CP-12, 2012, pp. 1Ð17.
+    * MESes
+[5] J. Marques-Silva, M. Janota, and A. Belov, ÒMinimal Sets over Monotone 
+    Predicates in Boolean Formulae,Ó in CAV-2013, pp. 1Ð16.
+    * progression-based algorithm
+[6] A. Belov, M. JŠrvisalo, and J. Marques-Silva, ÒFormula preprocessing in MUS 
+    extraction,Ó TACAS 2013, pp. 1Ð15, 2013.
+    * preprocessing
+    

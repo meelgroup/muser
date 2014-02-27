@@ -22,7 +22,7 @@ extern "C" {
   /** The handle */
   typedef void* muser2_t;
 
-  /** Literals are just signed integers */
+  /** literals are just signed integers */
   typedef int muser2_lit;
 
   /** Group ID are unsigned integers */

@@ -79,8 +79,8 @@ void muser2::set_delete_unnecessary_groups(bool dug)
 }
 
 /** Add a clause to the group-set. Forwards to muser2_impl. */
-muser2::gid muser2::add_clause(const muser2::Lit* first, 
-                               const muser2::Lit* last, muser2::gid gid)
+muser2::gid muser2::add_clause(const muser2::lit* first, 
+                               const muser2::lit* last, muser2::gid gid)
 {
   return (muser2::gid)_pimpl->add_clause(first, last, gid);
 }

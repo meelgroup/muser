@@ -20,19 +20,13 @@ LIBS = clset mus-2 wraps-2 wraps
 
 -include $(MKDIR)/makefile-common-defs
 
-apilib: $(OBJS) libs externallibs
-	@echo "Creating archive lib$(TRGT).a ..."
-	@rm -f lib$(TRGT).a
-	@mkdir __build
-	@mv $(OBJS) ./__build
-	@(cd ./__build ; \
-	ar -cq lib$(TRGT).a *.o ; \
-	mv $(OBJS) .. ; \
-	for f in $(LIBS); do ar -x ../$(SRCDIR)/$$f/*.a ; ar -q lib$(TRGT).a *.o ; rm -f *.o ; done ; \
-	for f in $(EXTERNALLIBS); do ar -x ../$(EXTDIR)/$$f/*.a ; ar -q lib$(TRGT).a *.o ; rm -f *.o ; done ; \
-	mv lib$(TRGT).a .. ; \
-	cd ..)
-	@rm -fr ./__build
+apilib: $(OBJS) libs
+	@-echo "Building lib$(TRGT).a"
+	@-mkdir bolt_arch
+	@-cp *.o bolt_arch
+	@-(cd bolt_arch; ar cqs lib$(TRGT).a *.o; rm *.o)
+	@-(cd bolt_arch; for f in $(LIBS); do mkdir $$f; cd $$f; ar x ../../$(SRCDIR)/$$f/*.a ; cd ..; done; ar qs lib$(TRGT).a `find . -name "*.o"`; cd ..; mv bolt_arch/lib$(TRGT).a .)
+	@-rm -fr bolt_arch
 	@echo "Done."
 
 #-------------------------------------------------------------------------------

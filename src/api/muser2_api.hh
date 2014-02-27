@@ -18,9 +18,9 @@ class muser2
 {
 public:         // Types
 
-  /** Literals are signed integers (non 0); clauses are arrays of literals given 
+  /** literals are signed integers (non 0); clauses are arrays of literals given 
    * by the start/end pointers. */
-  typedef int Lit;
+  typedef int lit;
   /** Group IDs are unsigned integers; gid_Undef is the special, undefined group 
    * ID. */
   typedef unsigned gid;
@@ -97,7 +97,7 @@ public:         // Addition of clauses and groups
    *
    * @return group-ID of the added (or existing) clause.
    */
-  gid add_clause(const Lit* first, const Lit* last, gid gid);
+  gid add_clause(const lit* first, const lit* last, gid gid);
 
   // TODO: add "normal" C++ versions of add_clause()
 

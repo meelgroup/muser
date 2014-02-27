@@ -28,11 +28,11 @@ lib: externallibs
 	@-echo "Building lib$(TRGT).a"
 	@-mkdir bolt_arch
 	@-cp *.o bolt_arch
-	@-cp *.o bolt_arch
 	@-(cd bolt_arch; ar cqs lib$(TRGT).a *.o; rm *.o)
-	@-(cd bolt_arch; for f in $(EXTERNALLIBS); do mkdir $$f; cd $$f; ar x ../../$(EXTDIR)/$$f/*.a ; cd ..; done; ar qs lib$(TRGT).a `find . -name "*.o"`; cd ..; mv bolt_arch/lib$(TRGT).a .)
+	@-(cd bolt_arch; for f in $(EXTERNALLIBS); do mkdir $$f; cd $$f; ar x ../../$(EXTDIR)/$$f/*.a ; for x in `ls *.o`; do mv $$x $$f:$$x; done; cd ..; done; ar qs lib$(TRGT).a `find . -name "*.o"`; cd ..; mv bolt_arch/lib$(TRGT).a .)
 	@-rm -fr bolt_arch
-
+	@-echo "Done"
+	
 # make sure all the solver's libraries are cleaned-up even when called from somewhere else
 dirallclean: clean libclean
 	@-(for f in $(EXTERNALLIBS); do (cd $(EXTDIR)/$$f ; make allclean) ; done)

@@ -178,7 +178,7 @@ LNKFLAGS += $(LLIBDIRS) $(LLIBS) $(LFLAGS)
 CPPFLAGS += -Wall -Wno-deprecated
 
 # other flags
-CPPFLAGS += -DBUILDDATE='"$(BUILDDATE)"' -DTOOLNAME='"$(XTRGT)"' -DCOMMITID='"$(COMMITID)"'
+CPPFLAGS += -DBUILDDATE='"$(BUILDDATE)"' -DCOMMITID='"$(COMMITID)"'
 
 # By default must include global defs
 CPPFLAGS += -I. -I$(SRCDIR)/include -I$(SRCDIR)/stubs $(IDIRS)

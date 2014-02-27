@@ -11,7 +11,7 @@ ROOT = ../../..
 
 -include $(ROOT)/makefile-includes    # Configuration of BOLT
 
-XTRGT = muser-2
+XTRGT = muser2
 
 CPPFLAGS += 
 

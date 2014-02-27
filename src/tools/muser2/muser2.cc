@@ -1,11 +1,11 @@
 /*----------------------------------------------------------------------------* \
- * File:        muser.cc
+ * File:        muser2.cc
  *
  * Description: MUS ExtractoR, version 2
  *
- * Author:      jpms, antonb
+ * Author:      antonb, jpms
  * 
- *                      Copyright (c) 2010-2012, Joao Marques-Silva, Anton Belov
+ *                      Copyright (c) 2010-2014, Anton Belov, Joao Marques-Silva
  \*----------------------------------------------------------------------------*/
 
 // Notes:

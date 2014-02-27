@@ -1,4 +1,4 @@
-muser-2.o: muser-2.cc ../../../src/mus-2/basic_group_set.hh \
+muser2.o: muser2.cc ../../../src/mus-2/basic_group_set.hh \
  ../../../src/include/globals.hh ../../../src/include/config.hh \
  ../../../src/include/macros.hh ../../../src/include/dbg_prt.hh \
  ../../../src/include/basic_types.h ../../../src/include/types.hh \

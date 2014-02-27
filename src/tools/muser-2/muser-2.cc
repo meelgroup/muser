@@ -479,9 +479,9 @@ namespace {
 #ifdef XPMODE
     cout << TOOL_HELP_EXP_SWITCHES;
 #endif
-    cout << "authors: " << authorname << " (" << authoremail << ")" << endl;
+    cout << "Authors:      " << authorname << " (" << authoremail << ")" << endl;
     if (strcmp(contribs, "")) {
-      cout_pref << "contributors: " << contribs << endl;
+      cout << "Contributors: " << contribs << endl;
     }
   }
 

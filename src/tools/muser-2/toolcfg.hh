@@ -18,7 +18,7 @@ namespace {
   const char* output_file = "muser2-output"; // prefix only
   const char* authorname = "Anton Belov, Joao Marques-Silva";
   const char* authoremail = "anton@belov-mcdowell.com, jpms@ucd.ie";
-  const char* contribs = "";
+  const char* contribs = "Alessandro Previti";
   const char* commit_id = COMMITID;
 
 }

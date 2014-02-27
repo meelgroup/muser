@@ -133,7 +133,7 @@ int muser2::muser2_impl::compute_gmus(void)
 
 /** Add a clause to the group-set
  */
-muser2::Gid muser2::muser2_impl::add_clause(const int* first, const int* last, muser2::Gid gid)
+muser2::gid muser2::muser2_impl::add_clause(const int* first, const int* last, muser2::gid gid)
 {
   vector<LINT> lits(first, last + 1);
   BasicClause* cl = _pgset->create_clause(lits);
@@ -146,7 +146,7 @@ muser2::Gid muser2::muser2_impl::add_clause(const int* first, const int* last, m
   } DBG(else { cout << "= muser2::add_clause: existing clause "; });
   // TODO: if the clause already exists, it needs to be deleted !
   DBG(cout << "{" << cl->get_grp_id() << "} " << *cl << endl;);
-  return (muser2::Gid)cl->get_grp_id();
+  return (muser2::gid)cl->get_grp_id();
 }
 
 /*----------------------------------------------------------------------------*/

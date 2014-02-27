@@ -79,10 +79,10 @@ void muser2::set_delete_unnecessary_groups(bool dug)
 }
 
 /** Add a clause to the group-set. Forwards to muser2_impl. */
-muser2::Gid muser2::add_clause(const muser2::Lit* first, 
-                               const muser2::Lit* last, muser2::Gid gid)
+muser2::gid muser2::add_clause(const muser2::Lit* first, 
+                               const muser2::Lit* last, muser2::gid gid)
 {
-  return (muser2::Gid)_pimpl->add_clause(first, last, gid);
+  return (muser2::gid)_pimpl->add_clause(first, last, gid);
 }
 
 /** Tests the current group-set for satisfiability. */
@@ -92,7 +92,7 @@ int muser2::test_sat(void) { return _pimpl->test_sat(); }
 int muser2::compute_gmus(void) { return _pimpl->compute_gmus(); }
 
 /** Returns a reference to the vector of group-IDs included in the group MUS */
-const vector<muser2::Gid>& muser2::gmus_gids(void) const { return _pimpl->gmus_gids(); }
+const vector<muser2::gid>& muser2::gmus_gids(void) const { return _pimpl->gmus_gids(); }
 
 //
 // C-style interface
@@ -217,7 +217,7 @@ int muser2_compute_gmus(muser2_t h)
  */
 int muser2_gmus_gids(muser2_t h, muser2_gid** first, muser2_gid** last)
 {
-  const vector<muser2::Gid>& gmus = pm(h)->gmus_gids();
+  const vector<muser2::gid>& gmus = pm(h)->gmus_gids();
   unsigned size = gmus.size();
   if (first) { *first = const_cast<muser2_gid*>(gmus.data()); }
   if (last) { *last = const_cast<muser2_gid*>(gmus.data() + size - 1); }

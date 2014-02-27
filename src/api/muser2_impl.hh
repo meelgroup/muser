@@ -64,7 +64,7 @@ public:         // Functionality
   /** Returns a reference to the vector of group-IDs included in the
    * computed MUS. The content is valid until the next init_run() call.
    */
-  std::vector<Gid>& gmus_gids(void) { return _gmus_gids; }
+  std::vector<gid>& gmus_gids(void) { return _gmus_gids; }
   
 public:         // Configuration
 
@@ -113,7 +113,7 @@ public:         // Addition of clauses and groups
    *
    * @return group-ID of the added (or existing) clause.
    */
-  Gid add_clause(const int* first, const int* last, Gid gid);
+  gid add_clause(const int* first, const int* last, gid gid);
 
 private:        // Main datastructures ...
 
@@ -147,7 +147,7 @@ private:        // Configuration
     
 private:        // Results
 
-  std::vector<Gid> _gmus_gids;          // group-IDs in the computed gmus
+  std::vector<gid> _gmus_gids;          // group-IDs in the computed gmus
 
 private:        // Misc
 

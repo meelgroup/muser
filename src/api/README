@@ -7,7 +7,9 @@ to extend.
 Basic instructions
 -------------------
 
-Compile with 'make apilib' -- this will create a static library libmuser2_api.a. 
+Compile with 'make apilib' (for options to make see the main README) -- this 
+will create a static library libmuser2_api.a.
+
 If you find that the library is too bulky for your taste, remove some of the
 SAT solvers compiled in. This can be done by going into src/wraps directory, 
 and modifying its Makefile, as well as hiding the unnecessary wrappers sources

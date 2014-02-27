@@ -23,8 +23,8 @@ public:         // Types
   typedef int Lit;
   /** Group IDs are unsigned integers; gid_Undef is the special, undefined group 
    * ID. */
-  typedef unsigned Gid;
-  const static Gid Gid_Undef = (Gid)-1;
+  typedef unsigned gid;
+  const static gid gid_Undef = (gid)-1;
 
 public:         // Lifecycle
 
@@ -97,7 +97,7 @@ public:         // Addition of clauses and groups
    *
    * @return group-ID of the added (or existing) clause.
    */
-  Gid add_clause(const Lit* first, const Lit* last, Gid gid);
+  gid add_clause(const Lit* first, const Lit* last, gid gid);
 
   // TODO: add "normal" C++ versions of add_clause()
 
@@ -119,7 +119,7 @@ public:         // Functionality
    * until the next init_run() call. The vector might be empty if group 0
    * is unsat (note that group 0 is not part of group MUS).
    */
-  const std::vector<Gid>& gmus_gids(void) const;
+  const std::vector<gid>& gmus_gids(void) const;
 
 private:
 

@@ -116,7 +116,7 @@ know about it. There's a explaining how to deal with this in
 src/mkcfg/makefile-common-defs
 
 This source distribution also includes a source code for a (thin) API that allows
-to link in and execute muser2 from other soft. The API is in src/api/muser2_api.
+to link in and execute muser2 from other soft. The API is in src/api.
 See README in that directory for instructions.
 
 

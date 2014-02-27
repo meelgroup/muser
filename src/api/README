@@ -1,9 +1,8 @@
-### README @ Nov 28, 2012
 
 MUSer2 API (c) Anton Belov, 2012-14
 
-APPOLOGY: the library provides only a very basic interface; please feel free to
-extend.
+At the moment the library provides only a very basic interface; please feel free 
+to extend.
 
 Basic instructions
 -------------------

@@ -2,16 +2,13 @@
 ##
 ## Author:   antonb
 ##
-## Note: make sure to pass extras=1 on command line
-##
-## make extras=1 static=1 apilib to build the static library
 ##
 
 #-------------------------------------------------------------------------------
 # Define source root, the target name and include standard defs
 #-------------------------------------------------------------------------------
 
-ROOT = ../../..
+ROOT = ../..
 
 -include $(ROOT)/makefile-includes    # Configuration of BOLT
 

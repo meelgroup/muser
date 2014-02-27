@@ -10,8 +10,7 @@
  *                                              Copyright (c) 2012, Anton Belov
 \*----------------------------------------------------------------------------*/
 
-#ifndef _MUSER2_IMPL_HH
-#define _MUSER2_IMPL_HH 1
+#pragma once
 
 #include <vector>
 #include "basic_group_set.hh"
@@ -23,19 +22,19 @@
 
 /** This is the API for MUS/GMUS extraction.
  */
-class MUSer2::MUSer2_Impl
+class muser2::muser2_impl
 {
 
 public:         // Lifecycle
 
   /** Constructor */
-  MUSer2_Impl(void);
+  muser2_impl(void);
   /** Destructor */
-  ~MUSer2_Impl(void);
+  ~muser2_impl(void);
 
   // copying and assignment are prohibited
-  MUSer2_Impl(const MUSer2& from) = delete;
-  MUSer2_Impl& operator=(const MUSer2_Impl& from) = delete;
+  muser2_impl(const muser2& from) = delete;
+  muser2_impl& operator=(const muser2_impl& from) = delete;
 
   /** Initializes all internal data-structures */
   void init_all(void);
@@ -155,7 +154,5 @@ private:        // Misc
   unsigned _init_gsize = 0;             // initial number of groups
 
 };
-
-#endif /* _MUSER2_IMPL_HH */
 
 /*----------------------------------------------------------------------------*/

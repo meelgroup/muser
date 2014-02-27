@@ -22,32 +22,34 @@ namespace {     // local declarations ...
 }
 
 /** Constructor */
-MUSer2::MUSer2_Impl::MUSer2_Impl(void)
+muser2::muser2_impl::muser2_impl(void)
 {
-  DBG(cout << "= MUSer2::constructor" << endl;);
+  DBG(cout << "= muser2::constructor" << endl;);
   // prepare default parameters
+  // TODO: all the configuration parameters passable through API, so that users
+  // could configure SAT solvers, algorithms, etc.
   config.set_grp_mode();
-  config.set_sat_solver("minisats"); // TODO: make parameter
+  config.set_sat_solver("glucoses");
   config.set_refine_clset_mode();
   config.set_rmr_mode();
 }
 
 /** Destructor */
-MUSer2::MUSer2_Impl::~MUSer2_Impl(void)
+muser2::muser2_impl::~muser2_impl(void)
 {
-  DBG(cout << "= MUSer2::destructor" << endl;);
+  DBG(cout << "= muser2::destructor" << endl;);
 }
 
 /** Initializes all internal data-structures */
-void MUSer2::MUSer2_Impl::init_all(void)
+void muser2::muser2_impl::init_all(void)
 {
   DBG(string cfg; config.get_cfgstr(cfg);
-      cout << "= MUSer2::init_all, configuration string: " << cfg << endl;);
+      cout << "= muser2::init_all, configuration string: " << cfg << endl;);
   _pgset = new BasicGroupSet(config);
 }
 
 /** Resets all internal data-structures */
-void MUSer2::MUSer2_Impl::reset_all(void)
+void muser2::muser2_impl::reset_all(void)
 {
     //INIT ALEX Remove all clauses
   vector<BasicClause*>::iterator it_sapos = cl_savec.begin();
@@ -60,15 +62,15 @@ void MUSer2::MUSer2_Impl::reset_all(void)
   cl_savec.clear();
   //END ALEX
   
-  DBG(cout << "= MUSer2::reset_all" << endl;);
+  DBG(cout << "= muser2::reset_all" << endl;);
   delete _pgset;
 }
 
 /** Prepares extractor for the run */
-void MUSer2::MUSer2_Impl::init_run(void)
+void muser2::muser2_impl::init_run(void)
 {
   DBG(string cfg; config.get_cfgstr(cfg);
-      cout << "= MUSer2::init_run, configuration string: " << cfg << endl;);
+      cout << "= muser2::init_run, configuration string: " << cfg << endl;);
   _pmd = new MUSData(*_pgset);
   _imgr.reg_ids(_pgset->max_var()); // FIXME: this will break in incremental mode !
   _gmus_gids.clear();
@@ -76,18 +78,18 @@ void MUSer2::MUSer2_Impl::init_run(void)
 }
 
 /** Clears up all data-structures used for the run */
-void MUSer2::MUSer2_Impl::reset_run(void)
+void muser2::muser2_impl::reset_run(void)
 {
-  DBG(cout << "= MUSer2::reset_run" << endl;);
+  DBG(cout << "= muser2::reset_run" << endl;);
   delete _pmd;
 }
 
 /** Tests the current group-set for satisfiability.
  * @return SAT competition code: 0 - UNKNOWN, 10 - SAT, 20 - UNSAT
  */
-unsigned MUSer2::MUSer2_Impl::test_sat(void)
+unsigned muser2::muser2_impl::test_sat(void)
 {
-  DBG(cout << "= MUSer2::test_sat, checking for satisfiability ..." << endl;);
+  DBG(cout << "= muser2::test_sat, checking for satisfiability ..." << endl;);
   SATChecker schecker(_imgr, config);
   CheckUnsat cu(*_pmd);
   if (schecker.process(cu) && cu.completed())
@@ -98,9 +100,9 @@ unsigned MUSer2::MUSer2_Impl::test_sat(void)
 
 /** Compute a group-MUS of the current group-set.
  */
-int MUSer2::MUSer2_Impl::compute_gmus(void)
+int muser2::muser2_impl::compute_gmus(void)
 {
-  DBG(cout << "= MUSer2::compute_gmus, computing ..." << endl;);
+  DBG(cout << "= muser2::compute_gmus, computing ..." << endl;);
   MUSExtractor mex(_imgr, config);
   mex.set_cpu_time_limit(_cpu_limit);
   mex.set_iter_limit(_iter_limit);
@@ -111,7 +113,7 @@ int MUSer2::MUSer2_Impl::compute_gmus(void)
       });
     bool approx = (_pmd->nec_gids().size() - _pmd->nec(0)) != _gmus_gids.size();
     if (_verb >= 1) {
-      cout_pref << "MUSer2 finished in " << mex.cpu_time() << " sec."
+      cout_pref << "muser2 finished in " << mex.cpu_time() << " sec."
                 << " init_size: " << _init_gsize
                 << " GMUS_size: " << _gmus_gids.size() 
                 << " exact: " << !approx
@@ -120,7 +122,7 @@ int MUSer2::MUSer2_Impl::compute_gmus(void)
                 << " refined: " << mex.ref_groups()
                 << endl;
     }
-    DBG(cout << "MUSer2 core : { ";
+    DBG(cout << "muser2 core : { ";
         for (GID gid : _gmus_gids) { cout << gid << " "; }
         cout << "}" << endl;);
     return (approx) ? 0 : 20;
@@ -131,7 +133,7 @@ int MUSer2::MUSer2_Impl::compute_gmus(void)
 
 /** Add a clause to the group-set
  */
-MUSer2::Gid MUSer2::MUSer2_Impl::add_clause(const int* first, const int* last, MUSer2::Gid gid)
+muser2::Gid muser2::muser2_impl::add_clause(const int* first, const int* last, muser2::Gid gid)
 {
   vector<LINT> lits(first, last + 1);
   BasicClause* cl = _pgset->create_clause(lits);
@@ -140,11 +142,11 @@ MUSer2::Gid MUSer2::MUSer2_Impl::add_clause(const int* first, const int* last, M
   //END ALEX
   if (cl->get_grp_id() == gid_Undef) {
     _pgset->set_cl_grp_id(cl, (GID)gid);     
-    DBG(cout << "= MUSer2::add_clause: new clause ";);
-  } DBG(else { cout << "= MUSer2::add_clause: existing clause "; });
+    DBG(cout << "= muser2::add_clause: new clause ";);
+  } DBG(else { cout << "= muser2::add_clause: existing clause "; });
   // TODO: if the clause already exists, it needs to be deleted !
   DBG(cout << "{" << cl->get_grp_id() << "} " << *cl << endl;);
-  return (MUSer2::Gid)cl->get_grp_id();
+  return (muser2::Gid)cl->get_grp_id();
 }
 
 /*----------------------------------------------------------------------------*/

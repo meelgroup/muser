@@ -10,12 +10,11 @@
  *                                              Copyright (c) 2012, Anton Belov
 \*----------------------------------------------------------------------------*/
 
-#ifndef _MUSER2_API_HH
-#define _MUSER2_API_HH 1
+#pragma once
 
 /** This is the API for MUS/GMUS extraction.
  */
-class MUSer2 
+class muser2 
 {
 public:         // Types
 
@@ -30,12 +29,12 @@ public:         // Types
 public:         // Lifecycle
 
   /** Constructor */
-  MUSer2(void);
+  muser2(void);
   /** Destructor */
-  ~MUSer2(void);
+  ~muser2(void);
 
   // copying and assignment are prohibited
-  private: MUSer2(const MUSer2& from); MUSer2& operator=(const MUSer2& from); 
+  private: muser2(const muser2& from); muser2& operator=(const muser2& from); 
   public:
 
   /** Initializes all internal data-structures */
@@ -70,7 +69,7 @@ public:         // Configuration
    * 0 - default (max->min)
    * 3 - reverse (min->max)
    * 4 - random
-   * Other values can be looked up in MUSer2 help.
+   * Other values can be looked up in muser2 help.
    */
   void set_order(unsigned order);
 
@@ -124,11 +123,9 @@ public:         // Functionality
 
 private:
 
-  class MUSer2_Impl;
-  MUSer2_Impl* _pimpl;
+  class muser2_impl;
+  muser2_impl* _pimpl;    // PIMPL idiom
 
 };
-
-#endif /* _MUSER2_API_HH */
 
 /*----------------------------------------------------------------------------*/

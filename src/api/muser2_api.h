@@ -10,8 +10,7 @@
  *                                              Copyright (c) 2012, Anton Belov
 \*----------------------------------------------------------------------------*/
 
-#ifndef _MUSER2_API_H
-#define _MUSER2_API_H 1
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,78 +20,78 @@ extern "C" {
    */
 
   /** The handle */
-  typedef void* MUSer2_t;
+  typedef void* muser2_t;
 
   /** Literals are just signed integers */
-  typedef int MUSer2_Lit;
+  typedef int muser2_lit;
 
   /** Group ID are unsigned integers */
-  typedef unsigned MUSer2_Gid;
-  const static MUSer2_Gid MUSer2_Gid_Undef = (MUSer2_Gid)-1;
+  typedef unsigned muser2_gid;
+  const static muser2_gid muser2_gid_Undef = (muser2_gid)-1;
 
   // Lifecycle
 
   /** Constructor */
-  MUSer2_t muser2_create(void);
+  muser2_t muser2_create(void);
 
   /** Destructor
    * @return 0 on success, -1 on error
    */
-  int muser2_destroy(MUSer2_t h);
+  int muser2_destroy(muser2_t h);
 
   /** Initializes all internal data-structures 
    * @return 0 on success, -1 on error
    */
-  int muser2_init_all(MUSer2_t h);
+  int muser2_init_all(muser2_t h);
 
   /** Resets all internal data-structures 
    * @return 0 on success, -1 on error
    */
-  int muser2_reset_all(MUSer2_t h);
+  int muser2_reset_all(muser2_t h);
 
   /** Prepares extractor for the run 
    * @return 0 on success, -1 on error
    */
-  int muser2_init_run(MUSer2_t h);
+  int muser2_init_run(muser2_t h);
 
   /** Clears up all data-structures used for the run 
    * @return 0 on success, -1 on error
    */
-  int muser2_reset_run(MUSer2_t h);
+  int muser2_reset_run(muser2_t h);
 
   // Configuration
 
   /** Sets verbosity level and prefix for output messages; 0 means silent.
    * Defaults: 0, ""
    */
-  void muser2_set_verbosity(MUSer2_t h, unsigned verb, const char* prefix);
+  void muser2_set_verbosity(muser2_t h, unsigned verb, const char* prefix);
 
   /** Sets soft CPU time limit for extraction (seconds, 0 = no limit).
    */
-  void muser2_set_cpu_time_limit(MUSer2_t h, double limit);
+  void muser2_set_cpu_time_limit(muser2_t h, double limit);
 
   /** Sets the limit on the number of iteration, where an "iteration" is
    * typically an iteration of the main loop of the algo. (0 = no limit).
    */
-  void muser2_set_iter_limit(MUSer2_t h, unsigned limit);
+  void muser2_set_iter_limit(muser2_t h, unsigned limit);
 
   /** Sets group removal order:
    * 0 - default (max->min)
    * 3 - reverse (min->max)
    * 4 - random
-   * Other values can be looked up in MUSer2 help.
+   * Other values can be looked up in muser2 help.
    */
-  void muser2_set_order(MUSer2_t h, unsigned order);
+  void muser2_set_order(muser2_t h, unsigned order);
 
   /** When 1, the groups deemed to be necessary (i.e. included in the
    * computed MUS) are added permanently to the group-set; i.e. they become
    * part of group 0. Default: 1. */
-  void muser2_set_finalize_necessary_groups(MUSer2_t h, int fng);
+  void muser2_set_finalize_necessary_groups(muser2_t h, int fng);
 
   /** When 1, the groups deemed to be unnecessary (i.e. outside of the
    * computed MUS) are removed permanently from the group-set. Default: true.
    */
-  void muser2_set_delete_unnecessary_groups(MUSer2_t h, int dug);
+  void muser2_set_delete_unnecessary_groups(muser2_t h, int dug);
 
   // Addition of clauses and groups
 
@@ -108,7 +107,7 @@ extern "C" {
    *
    * @return group-ID of the added (or existing) clause.
    */
-  MUSer2_Gid muser2_add_clause(MUSer2_t h, MUSer2_Lit* first, MUSer2_Lit* last, MUSer2_Gid gid);
+  muser2_gid muser2_add_clause(muser2_t h, muser2_lit* first, muser2_lit* last, muser2_gid gid);
 
   // Functionality
 
@@ -116,13 +115,13 @@ extern "C" {
    * @return SAT competition code: 0 - UNKNOWN, 10 - SAT, 20 - UNSAT or -1 in
    *         case of error.
    */
-  int muser2_test_sat(MUSer2_t h);
+  int muser2_test_sat(muser2_t h);
 
   /** Compute a group-MUS of the current group-set.
    * @return 0 if GMUS approximation is computed, 20 if GMUS is precise, -1 on 
    * error
    */
-  int muser2_compute_gmus(MUSer2_t h);
+  int muser2_compute_gmus(muser2_t h);
 
   /** Returns pointers to the first and the last elements of the array that
    * contains the the group-IDs included in the group MUS previously computed 
@@ -134,12 +133,10 @@ extern "C" {
    *
    * @return the number of groups in the vector (might be 0 if group 0 is unsat)
    */
-  int muser2_gmus_gids(MUSer2_t h, MUSer2_Gid** first, MUSer2_Gid** last);
+  int muser2_gmus_gids(muser2_t h, muser2_gid** first, muser2_gid** last);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _MUSER2_API_HH */
 
 /*----------------------------------------------------------------------------*/

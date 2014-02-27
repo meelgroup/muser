@@ -126,7 +126,7 @@ private:        // Main datastructures ...
   MUSData* _pmd = 0;                    // MUSData
 
   //INIT ALEX
-  vector<BasicClause*> cl_savec;
+  std::vector<BasicClause*> cl_savec;
   //END ALEX
 
 private:        // Configuration

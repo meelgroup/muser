@@ -15,7 +15,7 @@
 
 using namespace std;
 
-//#define DBG(x) x
+#define DBG(x) x
 
 namespace {     // local declarations ...
 
@@ -135,12 +135,17 @@ int muser2::muser2_impl::compute_gmus(void)
  */
 muser2::gid muser2::muser2_impl::add_clause(const int* first, const int* last, muser2::gid gid)
 {
+  for (const int* f = first; f < last+1; ++f) cout << *f << " ";
+  cout << "0" << endl;
   vector<LINT> lits(first, last + 1);
+  for (LINT l : lits) { cout << l << " "; }
+  cout << "0" << endl;
   BasicClause* cl = _pgset->create_clause(lits);
   //INIT ALEX
   cl_savec.push_back(cl);
   //END ALEX
   if (cl->get_grp_id() == gid_Undef) {
+    if (gid == gid_Undef) { gid = _pgset->max_gid() + 1; }
     _pgset->set_cl_grp_id(cl, (GID)gid);     
     DBG(cout << "= muser2::add_clause: new clause ";);
   } DBG(else { cout << "= muser2::add_clause: existing clause "; });

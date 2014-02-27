@@ -7,18 +7,27 @@
  * 
  * Notes:
  *
+ *   1. IMPORTANT: this implementation is NOT multi-thread safe, and NOT ready
+ *      for use multi-threaded mode.
  *
- *                                              Copyright (c) 2011, Anton Belov
+ *
+ *                                          Copyright (c) 2011-2013, Anton Belov
  \*----------------------------------------------------------------------------*/
+
+#ifdef NDEBUG
+//#undef NDEBUG // enable assertions (careful !)
+#endif
 
 #include <cassert>
 #include <ext/hash_set>
+#include <unordered_map>
 #include <iostream>
 #include <list>
 #include <queue>
 #include "basic_group_set.hh"
 #include "types.hh"
 #include "model_rotator.hh"
+#include "utils.hh"
 
 using namespace std;
 using namespace __gnu_cxx;
@@ -36,29 +45,23 @@ namespace {
     rot_queue_entry(GID gid, list<ULINT>& delta) : _gid(gid), _delta(delta) {}
   };
 
-  // Flips a variable in the assignment
-  void flip(IntVector& ass, ULINT var);
-
-  // Returns the truth-value of clause under assignment: -1;0:+1
-  int tv_clause(IntVector& ass, const BasicClause* cl);
-
-  // Checks whether a given assignment satisfies a set of clauses; return 1 for SAT, -1
-  // for UNSAT, 0 for undetermined. A set is SAT iff all clauses are SAT, a set
-  // is UNSAT iff at least one clause is UNSAT, undetermined otherwise
-  int tv_group(IntVector& ass, const BasicClauseVector& clauses);
-
 } // anonymous namespace
 
 /* Handles the RotateModel work item
  */
-bool RecursiveModelRotator::process(RotateModel& rm)
+template<class Dec>
+bool RecursiveModelRotatorTmpl<Dec>::process(RotateModel& rm)
 {
   MUSData& md = rm.md();
   BasicGroupSet& gs = md.gset();
   OccsList& o_list = gs.occs_list();
   const IntVector& orig_model = rm.model();
 
-  DBG(cout << "+RecursiveModelRotator::process(" << rm.gid() << ")" << endl;);
+#ifdef MULTI_THREADED
+  throw logic_error("RecursiveModelRotatorTmpl::process() is not ready for multi-threaded mode.");
+#endif
+
+  DBG(cout << "+RecursiveModelRotatorTmpl::process(" << rm.gid() << ")" << endl;);
 
   // models are coded in terms of their deltas to the original model - a delta
   // is a list or set of variables in the original model that should be flipped;
@@ -80,7 +83,7 @@ bool RecursiveModelRotator::process(RotateModel& rm)
     DBG(cout << ", delta: ";);
     for (list<ULINT>::iterator pv = e._delta.begin(); pv != e._delta.end(); ++pv) {
       DBG(cout << *pv << " ";);
-      flip(curr_ass, *pv);
+      Utils::flip(curr_ass, *pv);
     }
     DBG(cout << endl;);
 
@@ -95,7 +98,7 @@ bool RecursiveModelRotator::process(RotateModel& rm)
     for (cvec_citerator pcl = gclauses.begin(); pcl != gclauses.end(); ++pcl) {
       if ((*pcl)->removed()) 
         continue;
-      else if (tv_clause(curr_ass, *pcl) == -1) {
+      else if (Utils::tv_clause(curr_ass, *pcl) == -1) {
         if ((*pcl)->asize() == 0) { // empty clause -- get out, can't do anything
           DBG(cout << "Saw an empty clause, can't do anything else." << endl;);
           goto _done;
@@ -110,7 +113,7 @@ bool RecursiveModelRotator::process(RotateModel& rm)
     // ids -- if its of size 1, it will go into the queue
     for (IntSet::iterator pv = cand_vars.begin(); pv != cand_vars.end(); ++pv) {
       LINT lit = *pv * curr_ass[*pv]; // clauses with lit might become falsified
-      flip(curr_ass, *pv);
+      Utils::flip(curr_ass, *pv);
       DBG(cout << "  Checking var " << *pv << ", assigned " << curr_ass[*pv] << ": ";);
       GIDSet new_gids; // these will be falsified gids -- this is a plubming
                        // for the future work on dependencies
@@ -119,7 +122,7 @@ bool RecursiveModelRotator::process(RotateModel& rm)
       for (cvec_citerator pcl = gclauses.begin(); pcl != gclauses.end(); ++pcl) {
         if ((*pcl)->removed()) 
           continue;
-        else if (tv_clause(curr_ass, *pcl) == -1) {
+        else if (Utils::tv_clause(curr_ass, *pcl) == -1) {
           new_gids.insert(gid);
           break;
         }
@@ -133,9 +136,10 @@ bool RecursiveModelRotator::process(RotateModel& rm)
             pcl = lclauses.erase(pcl);
             continue;
           }
-          if (tv_clause(curr_ass, *pcl) == -1) {
+          if (Utils::tv_clause(curr_ass, *pcl) == -1) {
             GID cand_gid = (*pcl)->get_grp_id();
-            new_gids.insert(cand_gid);  
+            if ((cand_gid != 0) || !rm.ignore_g0())
+              new_gids.insert(cand_gid);  
             // early break: if new_gids.size() > 1 -- get out
             if (new_gids.size() > 1)
               break;
@@ -147,9 +151,8 @@ bool RecursiveModelRotator::process(RotateModel& rm)
         // check if singleton and new - if yes, enqueue and add
         if (new_gids.size() == 1) {
           GID new_gid = *new_gids.begin();
-          // here we have an option to pick into the globally known set of 
-          // necessary gids, as well as the local one - we'll do both
-          if (!md.nec(new_gid) && rm.nec_gids().find(new_gid) == rm.nec_gids().end()) {
+          // consult the decider
+          if (_d.rotate_through(rm, new_gid, lit)) {
             rm.nec_gids().insert(new_gid);
             rot_queue_entry r(new_gid, e._delta);
             r._delta.push_back(*pv);
@@ -162,65 +165,58 @@ bool RecursiveModelRotator::process(RotateModel& rm)
         }
       } // if (new_gids.size() == 0) ...
       // unflip
-      flip(curr_ass, *pv);
+      Utils::flip(curr_ass, *pv);
     }
     // restore working model
     for (list<ULINT>::iterator pv = e._delta.begin(); pv != e._delta.end(); ++pv)
-      flip(curr_ass, *pv);
+      Utils::flip(curr_ass, *pv);
     // done this group-set
     rot_queue.pop();
     _num_points++;
   } // while (queue)
  _done:
   rm.set_completed();
+  if (rm.ignore_global()) { _d.clear(); }
   DBG(cout << "-RecursiveModelRotator::process(" << rm.gid() << ")" << endl;);
   return rm.completed();
 }
 
+
+/** Implementation of DeciderRMR::rotate_through --- pick into the globally
+ * known set of necessary gids (unless said not to) and the local one
+ */
+bool DeciderRMR::rotate_through(RotateModel& rm, GID gid, LINT lit)
+{
+  return (rm.ignore_global() || !rm.md().nec(gid))
+          && rm.nec_gids().find(gid) == rm.nec_gids().end();
+
+}
+
+/** Implementation of DeciderSMR::rotate_through -- keeps track of which literal
+ * is used to arrive at the group. depth controls how many times can re-visit on
+ * the same literal
+ */
+bool DeciderSMR::rotate_through(RotateModel& rm, GID gid, LINT lit)
+{
+  group_map::iterator pm = _gm.find(gid);
+  if (pm == _gm.end()) { pm = _gm.emplace(make_pair(gid, lit_count_map())).first; }
+  lit_count_map& lm = pm->second;
+  lit_count_map::iterator pl = lm.find(lit);
+  if (pl == lm.end()) { pl = lm.emplace(make_pair(lit, 0)).first; }
+  unsigned vc = ++pl->second;
+  DBG(cout << "gid=" << gid << ", lit=" << lit << ", vc = " << vc << endl;);
+  return (vc <= _depth);
+}
+
+// this is to instantiate the templates -- allows to keep in the implementation
+// in .cc file (C++11 feature); if you need another type, add it here
+template class RecursiveModelRotatorTmpl<DeciderRMR>;
+template class RecursiveModelRotatorTmpl<DeciderSMR>;
 
 //
 // ------------------------  Local implementations  ----------------------------
 //
 
 namespace {
-
-  // Returns the truth-value of clause under assignment: -1;0:+1
-  int tv_clause(IntVector& ass, const BasicClause* cl)
-  {
-    unsigned false_count = 0;
-    for(CLiterator lpos = cl->abegin(); lpos != cl->aend(); ++lpos) {
-      int var = abs(*lpos);
-      if (ass[var]) {
-        if ((*lpos > 0 && ass[var] == 1) ||
-            (*lpos < 0 && ass[var] == -1))
-          return 1;
-        false_count++;
-      }
-    }
-    return (false_count == cl->asize()) ? -1 : 0;
-  }
-
-  // Checks whether a given assignment satisfies a set of clauses; return 1 for SAT, -1
-  // for UNSAT, 0 for undetermined. A set is SAT iff all clauses are SAT, a set
-  // is UNSAT iff at least one clause is UNSAT, undetermined otherwise
-  int tv_group(IntVector& ass, const BasicClauseVector& clauses)
-  {
-    unsigned sat_count = 0;
-    for (cvec_citerator pcl = clauses.begin(); pcl != clauses.end(); ++pcl) {
-      int tv = tv_clause(ass, *pcl);
-      if (tv == -1)
-        return -1;
-      sat_count += tv;
-    }
-    return (sat_count == clauses.size()) ? 1 : 0;
-  }
-
-  // Flips a variable in the assignment
-  void flip(IntVector& ass, ULINT var) {
-    LINT val = ass[var];
-    assert(val != 0); // really shouldn't be flipping unassigned vars
-    if (val)
-      ass[var] = (val == 1) ? -1 : 1;
-  }
 
 } // anonymous namespace

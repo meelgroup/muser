@@ -48,7 +48,7 @@ public:
     clreg(ClauseRegistry::instance()), clauses(), g2cv_map(), clvect() {
     top_weight = LONG_MAX; def_clw = top_weight; def_cltype = CL_HARD;
     num_hard_cls = num_soft_cls = num_other_cls = num_weighted_cls = 0;
-    soft_units = false;
+    soft_units = false; max_var = 0;
   }
 
   virtual ~BasicClauseSet() {
@@ -105,11 +105,16 @@ public:
       clauses.insert(ncl);
       clreg.incr_cl_refs(ncl);
       set_def_cltype(ncl);    // Clause is new; set type as default type
-    } DBG(else { cout << "Clause already exists: "<<*ncl<<endl;});
+    } DBG(else { cout << "Clause already exists: "<<*ncl<<endl; });
+    if (ncl->get_max_lit() > max_var) { max_var = ncl->get_max_lit(); }
     return ncl;
   }
 
-  void add_literal(BasicClause* cl, LINT nlit) { clreg.add_literal(cl, nlit); }
+  void add_literal(BasicClause* cl, LINT nlit) {
+    clreg.add_literal(cl, nlit);
+    // assume the clause is in this clause set for this:
+    if ((nlit = std::labs(nlit)) > (LINT)max_var) { max_var = nlit; }
+  }
 
   void rm_clause(BasicClause* cl) {
     NDBG(cout << "Removing clause from clset: " << *cl << endl;);
@@ -126,6 +131,7 @@ public:
   BasicClause* attach_clause(BasicClause* ncl) {
     // Just add clause to clset
     clauses.insert(ncl);
+    if (ncl->get_max_lit() > max_var) { max_var = ncl->get_max_lit(); }
     return ncl;
   }
 
@@ -158,13 +164,25 @@ public:
 
   void set_num_vars(ULINT nvars) { }
 
-  ULINT get_num_vars() { return -1; }
+  ULINT get_num_vars() {
+    tool_warn("BasicClauseSet::get_num_vars() is not implemented, use get_max_var().");
+    return 0;
+  }
+
+  /** Returns an overestimate of the maximum variale ID in the clause set */
+  ULINT get_max_var(void) { return max_var; }
 
   void set_num_cls(ULINT ncls) { }
 
   ULINT get_num_cls() { return size(); }
 
   void set_top(XLINT topv) { assert(clauses.size() == 0); top_weight = topv; }
+
+  // Reset top is fragile.
+  // Precondition: No original soft clause has a weight greater than the new top.
+  // In case a bigger weight is given to top, the hard clauses should be traversed
+  // and updated to the new top
+  void reset_top(XLINT topv) { top_weight = topv; }
 
   XLINT get_top() { return top_weight; }
 
@@ -174,7 +192,7 @@ public:
 
   vector<LINT>& get_cl_lits(BasicClause* cl) { return cl->cl_lits(); }
 
-  void cl_lits(BasicClause* cl, IntVector lvect) {
+  void cl_lits(BasicClause* cl, IntVector& lvect) {
     Literator lpos = cl->begin(); Literator lend = cl->end();
     for(; lpos != lend; ++lpos) { lvect.push_back(*lpos); }
   }
@@ -198,6 +216,7 @@ public:
       XLINT nw = (cl->get_weight() + incr < top_weight) ?
 	(cl->get_weight() + incr) : top_weight;
       cl->set_weight(nw);
+      if (nw == top_weight) { ++num_hard_cls; }
     } //else { assert(0); }
     return cl->get_weight();
   }
@@ -350,6 +369,17 @@ public:    // Clean up
     clvect.clear();
   }
 
+  // Unsafe clear -- does not go into resistry; just clears up local structs;
+  // leaves the top weight untouched
+  inline void detach_all(void) {
+    clauses.clear();
+    for (XLInt2ClVMap::iterator pm = g2cv_map.begin(); pm != g2cv_map.end(); ++pm)
+      if (pm->second != NULL) { delete pm->second; }
+    g2cv_map.clear();
+    clvect.clear();
+    num_hard_cls = num_soft_cls = num_other_cls = num_weighted_cls = 0;
+  }
+
 public:    // Stats
 
   ULINT get_num_hard_cls() { return num_hard_cls; }
@@ -417,6 +447,8 @@ protected:
   BasicClauseVector clvect;
 
   bool iteron;
+
+  ULINT max_var;
 
 private:
 

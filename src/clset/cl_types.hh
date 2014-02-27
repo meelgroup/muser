@@ -15,6 +15,7 @@
 #ifndef _CL_TYPES_H
 #define _CL_TYPES_H 1
 
+#include <unordered_set>
 #include "basic_clause.hh"
 #include "cl_functors.hh"
 
@@ -37,8 +38,7 @@ class BasicClauseSet;
 typedef BasicClause* BasicClausePtr;
 typedef BasicClause** BasicClausePtrPtr;
 
-//typedef hash_set<BasicClause*,ClauseHash,ClauseEqual> HashedClauseSet;
-typedef hash_set<BasicClause*,ClPtrHash,ClPtrEqual> HashedClauseSet;
+typedef unordered_set<BasicClause*,ClPtrHash,ClPtrEqual> HashedClauseSet;
 typedef HashedClauseSet::iterator ClSetIterator;
 typedef HashedClauseSet::iterator cset_iterator;
 typedef HashedClauseSet::const_iterator cset_citerator;
@@ -77,6 +77,9 @@ typedef hash_map<BasicClause*,BasicClause*,ClPtrHash,ClPtrEqual> Cl2ClMap;
 
 typedef
 vector<BasicClauseSet*> ClauseSetVector;
+
+typedef
+set<BasicClauseSet*> ClauseSetSet;
 
 typedef 
 hash_map<LINT,BasicClauseVector*,IntHash,IntEqual> Int2ClVMap;

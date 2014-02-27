@@ -17,7 +17,6 @@
 
 #include "basic_clause.hh"
 
-
 //jpms:bc
 /*----------------------------------------------------------------------------*\
  * Functors based on class BasicClause
@@ -26,9 +25,9 @@
 
 class ClauseHash {
 public:
-  ULINT operator()(BasicClause* clref) const {  // see below new hash functions
+  std::size_t operator()(BasicClause* clref) const {  // see below new hash functions
     //return clref->clhash(); // -> Very slow; unable to undertand why
-    register ULINT hashv = 0;
+    register std::size_t hashv = 0;
     for(Literator pos = clref->begin(); pos != clref->end(); ++pos) {
       hashv ^= (*pos>0) ? *pos : -*pos;
     }
@@ -51,20 +50,20 @@ public:
 
 class ClPtrHash {
 public:
-  ULINT operator()(const BasicClause* ptr) const {
+  std::size_t operator()(const BasicClause* ptr) const {
 #if USE_CLAUSE_HASH
     // ANTON
     // if defined, the clause hash value is calculated based on content, not
     // the pointer -- give more predictable results; this code is taken from
     // ClauseHash
-    register ULINT hashv = 0;
+    register std::size_t hashv = 0;
     BasicClause* clref = (BasicClause*)ptr;
     for(Literator pos = clref->begin(); pos != clref->end(); ++pos) {
       hashv ^= (*pos>0) ? *pos : -*pos;
     }
     return hashv;
 #else
-    return (ULINT)ptr;
+    return (std::size_t)ptr;
 #endif
   }
 };
@@ -110,16 +109,24 @@ public:
   }
 };
 
+class ClWeightGreater {
+public:
+  bool operator()(BasicClause* ptr1, BasicClause* ptr2) const
+  {
+    return ptr1->get_weight() > ptr2->get_weight();
+  }
+};
+
 
 #define HPSHIFT 3
 #define HNSHIFT 2
 
 class LitVectHash {
 public:
-  ULINT operator()(vector<LINT>* lvect) const {
+  std::size_t operator()(vector<LINT>* lvect) const {
     //cout << "VECT SIZE:" << lvect->size() <<endl;
-    register ULINT hashv = 0;
-    //register ULINT hashv = 1;
+    register std::size_t hashv = 0;
+    //register std::size_t hashv = 1;
     //cout << "Hash value: " << hashv << endl; cout.flush();
     for(vector<LINT>::iterator pos=lvect->begin(); pos!=lvect->end(); ++pos) {
       // v3:

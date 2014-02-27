@@ -1,213 +1,235 @@
+//jpms:bc
 /*----------------------------------------------------------------------------*\
  * File:        solver_wrapper_gnonincr.hh
  *
- * Description: Base class for non-incremental group-based wrappers.
+ * Description: An adapter class that provides an incremental group-based
+ *              interface to an instance of SATSolverLowLevelNonIncrWrapper.
+ *              i.e. it fakes the incremental interface by reloading the
+ *              rele
  *
- * Author:      antonb 
+ * Author:      antonb
  *
  * Notes:
- *   1. concrete classes need to implement solver_add_clause(), plus all the 
- *   extra operations in the main interface methods; the SAT solver underneath
- *   needs to know to compute UNSAT core.
  *
- *   2. *NOT TESTED*
- *
- *                        Copyright (c) 2011-12, Anton Belov, Joao Marques-Silva
+ *                                              Copyright (c) 2013, Anton Belov
 \*----------------------------------------------------------------------------*/
+//jpms:ec
 
-#ifndef _SOLVER_WRAPPER_GNONINCR_H
-#define _SOLVER_WRAPPER_GNONINCR_H 1
+#pragma once
 
+#include <unordered_map>
+#include <unordered_set>
 #include "solver_wrapper.hh"
+#include "solver_llni_wrapper.hh"
 
 /*----------------------------------------------------------------------------*\
- * Class: SATSolverWrapperGrpNonincr
+ * Class: SATSolverWrapperGrpNonIncr
  *
- * Purpose: ABC for incremental group-based wrappers.
+ * Purpose: A group-based wrapper around SATSolverLowLevelNonIncrWrapper.
+ * The wrapper fakes the incremental behaviour by reloading the relevant set of
+ * clauses before invoking the underlying SAT solver.
  *
 \*----------------------------------------------------------------------------*/
 
-class SATSolverWrapperGrpNonIncr : public SATSolverWrapper {
+class SATSolverWrapperGrpNonIncr : public MUSer2::SATSolverWrapper {
 
-  friend class SATSolverFactory;
+  friend class MUSer2::SATSolverFactory;
 
 protected:  // Constructor/destructor
 
-  SATSolverWrapperGrpNonIncr(IDManager& _imgr)
-    : SATSolverWrapper(_imgr) {}
+  SATSolverWrapperGrpNonIncr(IDManager& _imgr, SATSolverLowLevelNonIncrWrapper& _llwrap)
+    : MUSer2::SATSolverWrapper(_imgr), llwrap(_llwrap) {}
   
   virtual ~SATSolverWrapperGrpNonIncr(void) {}
 
 public: // Implementation of the main interface methods
 
   /* Initialize all internal data structures */
-  virtual void init_all(void) {
-    model.clear(); gcore.clear(); gid2st_map.clear(); local_gset.clear();
-    maxvid = 0; maxgid = 0; isvalid = false;
-  }
+  virtual void init_all(void) override;
 
   /* Clean up all internal data structures */
-  virtual void reset_all(void) {
-    model.clear(); gcore.clear(); gid2st_map.clear(); local_gset.clear(); 
-    isvalid = false;
-  }
+  virtual void reset_all(void) override;
 
   /* Initialize data structures for SAT run */
-  virtual void init_run(void) {
-    if (isvalid)
-      throw std::logic_error("Solver interface is in invalid state.");
-    model.clear(); gcore.clear(); isvalid = true;
-  }
+  virtual void init_run(void) override;
 
   /* Clean up data structures from SAT run */
-  virtual void reset_run(void) {
-    if (!isvalid)
-      throw std::logic_error("Solver interface is in invalid state.");
-    model.clear(); gcore.clear(); isvalid = false;
-  }
+  virtual void reset_run(void) override;
 
   /* Solve the current set of clauses instance */
-  virtual SATRes solve(void) = 0;
+  virtual SATRes solve(void) override { return solve(nullptr); }
 
   /* Solve the current set of clauses with extra assumptions;
    * assumptions are given as units in 'assum' and passed directly
    * to the solver without any modifications.
    */
-  virtual SATRes solve(const IntVector& assum) = 0;
+  virtual SATRes solve(const IntVector& assum) override { return solve(&assum); }
 
+public: // Additional non-mandatory functionality
+
+  /** Returns true if this solver knows to do preprocessing; if this is overriden,
+   * then preprocess() should be implemented.
+   */
+  virtual bool is_preprocessing(void) override { return llwrap.is_preprocessing(); }
+
+  /** Preprocess the current set of clauses. If turn_off is set to true, no
+   * further preprocessing is possible; this might allow some solvers to release
+   * resources.
+   * @return SAT_True, SAT_False, SAT_NoRes depending on the results of prepro.
+   */
+  virtual SATRes preprocess(bool turn_off = false) override { return llwrap.preprocess(turn_off); }
+
+  /** Returns the activity of the specified variable
+   */
+  virtual double get_activity(ULINT var) override { return llwrap.get_activity(var); }
 
 public: // Configuration methods
 
   /* Verbosity -- usually passed to solver */
-  void set_verbosity(int verb) = 0;
+  virtual void set_verbosity(int verb) override { llwrap.set_verbosity(verb); }
 
   /* Sets the default phase: 0 - false, 1 - true, 2 - random */
-  void set_phase(LINT ph) = 0; 
+  virtual void set_phase(LINT phase) override { llwrap.set_def_phase(phase); }
 
+  /* If the solver supports this, sets the output stream to be used for writing
+   * out the proof trace in case of UNSAT outcome at the end of solve(); it
+   * is up to called to open/close the stream; 0 disables writing
+   */
+  virtual void set_proof_trace_stream(FILE* o_stream) override {
+    llwrap.set_proof_trace_stream(o_stream);
+  }
+
+  /* Sets the preferred phase for a particular variable: 0 - false, 1 - true
+   */
+  virtual void set_phase(ULINT var, LINT phase) override {
+    llwrap.set_phase(var, phase);
+  }
+
+  /* Sets the maximum number of conflicts per call. Note that this affects
+   * completeness. -1 = no maximum.
+   */
+  virtual void set_max_conflicts(LINT max_conflicts) override {
+    llwrap.set_max_conflicts(max_conflicts);
+  }
 
 public:   // Access result of SAT solver call
 
+  /* Returns the reference to the model (r/w) */
+  virtual IntVector& get_model(void) override { return llwrap.get_model(); }
+
+  /* Makes a copy of the model (resized as needed) */
+  virtual void get_model(IntVector& rmodel) override { llwrap.get_model(rmodel);}
+
   /* Returns the reference to the group unsat core */
-  virtual GIDSet& get_group_unsat_core(void) { return gcore; } 
+  virtual GIDSet& get_group_unsat_core(void) override { return gcore; }
+
+public: // Implemented non-group interface
+
+  /* This assumes that the GID of the clause is set correctly. It will create
+   * a new assumption variable if the GID has not been yet seen. This method 
+   * will  not check if the clause is marked as removed. Group 0 clauses are 
+   * added as final.
+   */
+  virtual void add_clause(BasicClause* cl) override {
+    solver_add_clause(cl, cl->get_grp_id() == 0);
+  }
+
+  /* Adds a final clause (non-removable) */
+  virtual void add_final_clause(BasicClause* cl) override {
+    solver_add_clause(cl, true);
+  }
+
+  /* Adds a final unit clause (non-removable) */
+  virtual void add_final_unit_clause(LINT lit) override {
+    solver_assert_unit_clause(lit);
+  }
 
 public: // Implemented group interface
 
   /* Number of groups (including 0) */
-  virtual LINT gsize(void) { return gid2st_map.size(); }
+  virtual LINT gsize(void) override { return g2st_map.size(); }
 
   /* Maximum GID ever used in the solver */
-  virtual GID max_gid(void) { return maxgid; }
+  virtual GID max_gid(void) override { return maxgid; }
 
-  /* Adds all groups in the groupset; g0final is ignored; makes a local
-   * copy of the group set
+  /* Adds all groups in the groupset */
+  virtual void add_groups(BasicGroupSet& gset, bool g0final = true) override;
+
+  /* Adds a single group from the groupset; if final = true the group is
+   * added as final right away.
    */
-  virtual void add_groups(BasicGroupSet& gset, bool g0final = true) {
-    for (gset_iterator pg = gset.gbegin(); pg != gset.gend(); ++pg) {
-      GID gid = *pg;
-      // if the group is completely empty
-      if (!gset.a_count(gid))
-        continue;
-      gid2st_map.insert(make_pair(gid, -1)); // active
-      BasicClauseVector& clauses = pg.gclauses();
-      for (ClVectIterator pcl = clauses.begin(); pcl != clauses.end(); ++pcl) {
-        BasicClause* cl = *pcl;
-        if (!cl->removed()) {
-          GID gid = cl->get_grp_id();
-          cl->set_grp_id(gid_Undef);
-          local_gset.add_clause(cl);
-          local_gset.set_cl_grp_id(cl, gid);
-        }
-      }
-    }
-    update_maxgid(gset.max_gid());
-    update_maxvid(gset.max_var());
-  }
+  virtual void add_group(BasicGroupSet& gset, GID gid, bool final = false) override;
 
   /* True if group exists in the solver */
-  virtual bool exists_group(GID gid) { 
-    return (gid2st_map.find(gid) != gid2st_map.end()); 
-  }
+  virtual bool exists_group(GID gid) override { return g2st_map.count(gid); }
 
   /* Activates (non-final) group */
-  virtual void activate_group(GID gid) {
-    GID2IntMap::iterator p = gid2st_map.find(gid);
-    assert(p != gid2st_map.end()); // exists
-    assert(p->second == 1); // not final, not active
-    p->second = -1;
-  }
+  virtual void activate_group(GID gid) override;
 
   /* Deactivates (non-final) group */
-  virtual void deactivate_group(GID gid) {
-    GID2IntMap::iterator p = gid2st_map.find(gid);
-    assert(p != gid2st_map.end()); // exists
-    assert(p->second == -1); // not final, active
-    p->second = 1;
-  }
+  virtual void deactivate_group(GID gid) override;
 
   /* Returns true if either final, or non-final and active */
-  virtual bool is_group_active(GID gid) {
-    GID2IntMap::iterator p = gid2st_map.find(gid);
-    assert(p != gid2st_map.end()); // exists
-    return (p->second <= 0);
-  }
+  virtual bool is_group_active(GID gid) override;
 
   /* Removes (non-final) group */
-  virtual void del_group(GID gid) {
-    GID2IntMap::iterator p = gid2st_map.find(gid);
-    assert(p != gid2st_map.end()); // exists
-    gid2st_map.erase(p);
-  }
+  virtual void del_group(GID gid) override;
 
   /* Finalizes a group */
-  virtual void make_group_final(GID gid) {
-    GID2IntMap::iterator p = gid2st_map.find(gid);
-    assert(p != gid2st_map.end()); // exists
-    p->second = 0;
-  }
+  virtual void make_group_final(GID gid) override;
 
   /* True if group is final */
-  virtual bool is_group_final(GID gid) {
-    GID2IntMap::iterator p = gid2st_map.find(gid);
-    assert(p != gid2st_map.end()); // exists
-    return p->second == 0;
-  }
+  virtual bool is_group_final(GID gid) override;
 
-protected: // These are the solver-specific functions -- to be implemented 
-           // by subclassses
+public:  // Miscellaneous (stats, printing, etc)
 
-  /* Add a clause to solver, with associated assumption (0 means no assumption)
+  /** Access to the underlying SAT solver.
    */
-  virtual void solver_add_clause(BasicClause* cl) = 0;
-
-protected: // Helpers
-
-  void update_maxvid(LINT nvid) {
-    ULINT unvid = (nvid > 0) ? nvid : -nvid;
-    if (unvid > maxvid)
-      maxvid = unvid;
+  virtual void* get_raw_solver_ptr(void) override {
+    return llwrap.get_raw_solver_ptr();
   }
 
-  void update_maxgid(GID gid) {
-    if (gid > maxgid)
-      maxgid = gid;
-  }
+protected: // helpers
+
+  /* Internal cleanup */
+  void cleanup(void);
+
+  /* Loads clauses in to the solver and runs the solve() */
+  SATRes solve(const IntVector* assump);
+
+  /* Adds a clause to the internal lists  */
+  void solver_add_clause(BasicClause* cl, bool final = false);
+
+  /* Add (assert) a unit clause (final) */
+  void solver_assert_unit_clause(LINT lit);
+
+  void update_maxgid(GID gid) { if (gid > maxgid) { maxgid = gid; } }
   
 protected:
 
-  GID2IntMap gid2st_map;            // map from group IDs to status: 
-                                    // 0 - group is final; -1 - group is active; 
-                                    // 1 - group is inactive
-
-  GIDSet gcore;                     // core
-
   bool isvalid = false;
 
-  ULINT maxvid = 0;                 // max variable id ever used
-  
-  GID maxgid = 0;                   // maximum group id (ever used)
+  SATSolverLowLevelNonIncrWrapper& llwrap;  // low-level non-incremental wrapper
+
+  std::unordered_map<GID,int> g2st_map;     // map from group IDs to status:
+                                            // 0 - group is final;
+                                            // 1 - group is active;
+                                            // -1 - group is inactive
+
+  BasicClauseSet cset;                      // all regular clauses are here
+
+  BasicClauseSet f_cset;                    // final clauses, but with non-0 group
+
+  std::vector<LINT> units;                  // extra units
+
+  GIDSet gcore;                             // group core
+
+  GID maxgid = 0;                           // maximum group id (ever used)
+
+private:
+
+  IntVector _clits;                         // vector for literals
 
 };
-
-#endif /* _SOLVER_WRAPPER_GNONINCR_H */
 
 /*----------------------------------------------------------------------------*/

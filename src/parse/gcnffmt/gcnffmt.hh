@@ -41,13 +41,13 @@ template<class B>
 static
 void read_gcnf_clause(B& in, ULINT& clgrp, ULINT& mxid, vector<LINT>& lits) {
   read_left_bracket(in);   // Parse left bracket
-  clgrp = parseInt(in);    // Read clause group
+  clgrp = FMTUtils::parseInt(in);    // Read clause group
   read_right_bracket(in);  // Parse right bracket
 
   LINT parsed_lit;
   lits.clear();
   for (;;){
-    parsed_lit = parseInt(in);
+    parsed_lit = FMTUtils::parseInt(in);
     if (parsed_lit == 0) break;
     if (fabs(parsed_lit) > mxid) { mxid = fabs(parsed_lit); }
     lits.push_back(parsed_lit);
@@ -63,22 +63,22 @@ static void parse_gcnf_file(B& in, IDManager& imgr, CSet& cldb) {
   ULINT clid = 0;   // index of the clause in the input
   vector<LINT> lits;
   for (;;){
-    skipWhitespace(in);
+	FMTUtils::skipWhitespace(in);
     if (*in == EOF)
       break;
     else if (*in == 'c')
-      skipLine(in);
+       FMTUtils::skipLine(in);
     else if (*in == 'p') {
       ++in;
       // Either read 2 or 3 integers, depending on new line
-      skipTabSpace(in);
-      string fmt = readString(in);
+      FMTUtils::skipTabSpace(in);
+      string fmt = FMTUtils::readString(in);
       if (fmt != "gcnf") {
 	cerr << "PARSE ERROR! Unexpected int: " << fmt << endl; exit(3); }
-      skipTabSpace(in);
+      FMTUtils::skipTabSpace(in);
       LINT intcnt = 1;
       while (*in != '\n' && *in != '\r') {
-	XLINT ival = parseLongInt(in);
+	XLINT ival = FMTUtils::parseLongInt(in);
 	if (intcnt == 1) { cldb.set_num_vars(ToLint(ival)); }
 	else if (intcnt == 2) { cldb.set_num_cls(ToLint(ival)); }
 	else if (intcnt == 3) { cldb.set_num_grp(ival); }
@@ -86,7 +86,7 @@ static void parse_gcnf_file(B& in, IDManager& imgr, CSet& cldb) {
 	  LINT lval = ToLint(ival);
 	  fprintf(stderr, "PARSE ERROR! Unexpected int: %ld\n",
 		  (long int)lval); exit(3);
-	} ++intcnt; skipTabSpace(in); }
+	} ++intcnt; FMTUtils::skipTabSpace(in); }
       ++in;
     } else {
       ULINT clgrp;

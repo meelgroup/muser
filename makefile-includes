@@ -19,6 +19,8 @@ EXTDIR    = $(SRCDIR)/extsrc
 EXTUTILDIR = $(SRCDIR)/extutil
 
 BUILDDATE = $(shell date +'%Y-%b-%d %R')
+COMMITID = $(shell git log -1 --pretty="%h")
+
 
 #-------------------------------------------------------------------------------
 

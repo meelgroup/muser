@@ -44,7 +44,7 @@ public:
   StreamBuffer(gzFile i) : in(i), pos(0), size(0) {
     resize_buffer(); assureLookahead(); }
 
-  virtual ~StreamBuffer() { delete buf; }
+  virtual ~StreamBuffer() { delete[] buf; }
 
   int  operator *  () { return (pos >= size) ? EOF : buf[pos]; }
   void operator ++ () { pos++; assureLookahead(); }
@@ -63,6 +63,8 @@ public:
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+namespace FMTUtils {
 
 template<class B>
 static void skipWhitespace(B& in) {
@@ -143,17 +145,17 @@ static XLINT parseLongInt(B& in) {
 template<class B>
 static void parseIdent(B& in, string & tmp)
 {
-	// 'tmp' is cleared, then filled with the parsed string. '(char*)tmp' is returned for convenience.
-	skipWhitespace(in);
-    //if ((*in < 'a' || *in > 'z') && (*in < 'A' || *in > 'Z') && *in != '_') throw nsprintf("Expected start of identifier, not: %c", *in);
-    tmp.clear();
-    tmp+=*in;
-    ++in;
-    while ((*in >= 'a' && *in <= 'z') || (*in >= 'A' && *in <= 'Z') || (*in >= '0' && *in <= '9') || *in == '_')
-        tmp+=*in,
-        ++in;
-    //tmp+="0";
-    //return (char*)tmp;
+  // 'tmp' is cleared, then filled with the parsed string. '(char*)tmp' is returned for convenience.
+  skipWhitespace(in);
+  //if ((*in < 'a' || *in > 'z') && (*in < 'A' || *in > 'Z') && *in != '_') throw nsprintf("Expected start of identifier, not: %c", *in);
+  tmp.clear();
+  tmp+=*in;
+  ++in;
+  while ((*in >= 'a' && *in <= 'z') || (*in >= 'A' && *in <= 'Z') || (*in >= '0' && *in <= '9') || *in == '_')
+    tmp+=*in,
+      ++in;
+  //tmp+="0";
+  //return (char*)tmp;
 }
 
 template<class B>
@@ -284,6 +286,8 @@ static void skip_comments(B& in)
 		if(*in == '*') skipLine(in);
 		else end=true;
 	}
+}
+
 }
 
 #endif /* _FMTUTILS_H */

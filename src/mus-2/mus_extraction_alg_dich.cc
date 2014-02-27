@@ -5,7 +5,9 @@
  *
  * Author:      antonb
  * 
- * Notes:       
+ * Notes:       1. MULTI_THREADED features are removed completely; clears the
+ *              lists inside MUSData. 
+ *
  *
  *                                              Copyright (c) 2012, Anton Belov
 \*----------------------------------------------------------------------------*/
@@ -19,6 +21,7 @@
 #include "mus_extraction_alg.hh"
 
 using namespace std;
+//using namespace __gnu_cxx;
 
 //#define DBG(x) x
 
@@ -44,6 +47,7 @@ void MUSExtractionAlgDich::operator()(void)
   CheckRangeStatus crs(_md);
   crs.set_refine(config.get_mus_mode() && config.get_refine_clset_mode());
   crs.set_need_model(config.get_model_rotate_mode());
+  crs.set_add_negation(config.get_irr_mode());
   RotateModel rm(_md);
 
   // main loop
@@ -138,6 +142,10 @@ void MUSExtractionAlgDich::operator()(void)
         // note that whatever model rotation finds us must be in the region [0,p_curr)
         rm.set_gid(*p_min);
         rm.set_model(last_model);
+        rm.set_rot_depth(config.get_rotation_depth());
+        rm.set_rot_width(config.get_rotation_width());
+        rm.set_ignore_g0(config.get_ig0_mode());
+        rm.set_ignore_global(config.get_iglob_mode());
         _mrotter.process(rm);
         if (!rm.completed())
           tool_abort(string("could not complete model rotation; in ")+__PRETTY_FUNCTION__);

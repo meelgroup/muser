@@ -1,0 +1,82 @@
+
+This directory contains the BOLT integration of abbreviation-based version of 
+minisat created by Jean Marie Lagniez, described in [1].
+
+[1] Jean Marie Lagniez and Armin Biere: Factoring Out Assumptions to Speed-Up MUS Extraction. SAT 2013
+
+Towards the future automation of the process, here's the record of steps:
+
+1. Get rid of all Main.cc files, and all original makefiles.
+
+$ find . -name "Main.cc" -exec rm {} \;
+
+2. Replace namespace Minisat with some other one:
+
+$ find . -type f -name "*.*" -exec sed -i '.bak' 's/namespace Minisat/namespace MinisatXXX/g' {} \;
+$ find . -type f -name "*.*" -exec sed -i '.bak' 's/Minisat::/MinisatXXX::/g' {} \;
+
+3. If not already there, add 
+
+#define __STDC_FORMAT_MACROS
+#define __STDC_LIMIT_MACROS
+
+to mtl/IntTypes.h after 
+
+#define Minisat_IntTypes_h
+
+These macros are needed to allow the extensions to formatting and numeric limits.
+
+4. Optional: add 
+
+#pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+
+to the top of mtl/IntTypes.h. This file is a good place to do this, since its included from any other file either directly or indirectly.
+
+5. If compiling with -std=c++11, then in utils/Options.h add space between a string literal and PRIi64 in
+fprintf statements (3 places):
+
+e.g. replace fprintf(stderr, "%4"PRIi64, range.begin); by fprintf(stderr, "%4" PRIi64, range.begin);
+
+$ sed -i '.bak' 's/"PRI/" PRI/g' utils/Options.h
+
+7. Replace the header guards like
+
+#ifndef Minisat_SimpSolver_h
+#define Minisat_SimpSolver_h
+
+#endif
+
+with 
+
+#pragma once
+
+or use unique name accross BOLT. This is to avoid errors if including various versions of minisat.
+
+$ find . -type f -name "*.*" -exec sed -i '.bak' 's/define Minisat_/define MinisatXXX_/g' {} \;
+$ find . -type f -name "*.*" -exec sed -i '.bak' 's/ifndef Minisat_/ifndef MinisatXXX_/g' {} \;
+
+8. Make sure that all minisat includes have the directory prefix, i.e. instead of
+
+#include "mtl/Vec.h"
+
+there's
+
+#include "../minisatXXX/mtl/Vec.h"
+
+This is needed because of idential file names accross various copies of minisat.
+
+$ find . -type f -name "*.*" -exec sed -i '.bak' 's/include "/include "..\/minisat-abbr\//g' {} \;
+
+Specific to minisat-abbr: fixed includes:
+
+$ find . -type f -name "*.*" -exec sed -i '.bak' 's/include "..\/minisat22-2\//include "/g' {} \;
+
+8. Put BOLT makefiles (e.g. copy from minisat-hmuc) in all directories; get rid of .mk files
+
+
+author: Anton Belov, May 2013
+
+
+

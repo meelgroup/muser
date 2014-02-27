@@ -48,10 +48,21 @@ public:
   bool operator()(LINT a, LINT b) const { return fabs(a) > fabs(b); }
 };
 
+class AbsLitEqual {
+public:
+  bool operator()(LINT a, LINT b) const { return fabs(a) == fabs(b); }
+};
+
+class LitNegated {
+public:
+  bool operator()(LINT a, LINT b) const { return a == -b; }
+};
+
 class PtrLess {
 public:
   bool operator()(const void* pa, const void* pb) const {
-    return (ULINT)pa < (ULINT)pb; }
+    return pa < pb;
+  }
 };
 
 
@@ -61,7 +72,7 @@ public:
 
 class PtrHash {
 public:
-  ULINT operator()(const void* ptr) const { return (ULINT)ptr; }
+  std::size_t operator()(const void* ptr) const { return (std::size_t)ptr; }
 };
  
 class PtrEqual {
@@ -72,6 +83,27 @@ public:
 };
 
  
+class DefIntHash {
+public:
+  int operator()(int val) { return val; }
+};
+ 
+class DefIntEqual {
+public:
+  bool operator()(int v1, int v2) { return v1 == v2; }
+};
+ 
+class DefUIntHash {
+public:
+  unsigned int operator()(unsigned int val) const { return val; }
+};
+ 
+class DefUIntEqual {
+public:
+  bool operator()(unsigned int v1, unsigned int v2) const { return v1 == v2; }
+};
+ 
+
 class IntHash {
 public:
   LINT operator()(LINT val) const { return val; }
@@ -277,6 +309,8 @@ typedef vector<bool> BoolVector;
 
 typedef hash_map<LINT,LINT,IntHash,IntEqual> Int2IntMap;
 
+typedef hash_map<LINT,XLINT,IntHash,IntEqual> Int2XLIntMap;
+
 typedef hash_map<XLINT,XLINT,XLIntHash,XLIntEqual> XLInt2XLIntMap;
 
 typedef hash_map<XLINT,LINT,XLIntHash,XLIntEqual> XLInt2IntMap;
@@ -287,6 +321,12 @@ typedef hash_map<XLINT,LINT,XLIntHash,XLIntEqual> XLInt2IntMap;
 typedef hash_set<ULINT,ULIntHash,ULIntEqual> ULINTSet;
 
 typedef hash_set<LINT,IntHash,IntEqual> LINTSet;
+
+typedef hash_set<int,DefIntHash,DefIntEqual> DefIntSet;
+
+typedef hash_set<unsigned int,DefUIntHash,DefUIntEqual> DefUIntSet;
+
+typedef vector<LINTSet*> LINTSetVect;
 
 typedef vector<ULINT> UIntVector;
 

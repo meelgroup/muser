@@ -1,0 +1,13 @@
+### README
+
+This directory is for various APIs for our tools.
+
+An API will typically consist of a single header file together with a library --
+these can be distributed to end users so that they can properly integrate our tools 
+into theirs (i.e. without shell scripts). As such the headers should be clean, and
+independent of other BOLT headers (since those do change on regular basis, and often
+contain a lot of implementation details). All the BOLT-specific details can be 
+hidden into the "implementation" class, which defined in the library, and just
+forward-declared in the user-accessible header. See muser2_api for an example.
+
+## Author:   antonb

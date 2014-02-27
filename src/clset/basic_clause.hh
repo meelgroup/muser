@@ -18,6 +18,10 @@
 #include "globals.hh"
 #include "cl_id_manager.hh"
 
+// Anton: added a bit of code to support various pre-processing and simplification 
+// techniques during MUS extraction. There's basically no run-time overhead 
+// except a few initializations (note that most of the methods are left unchanged
+// and so should not be used in applications that simplify clauses).
 
 //jpms:bc
 /*----------------------------------------------------------------------------*\
@@ -48,10 +52,11 @@ protected:
 
   BasicClause(const vector<LINT>& lits) 
     : clits(lits), weight(0), id(ClauseIdManager::Instance()->new_id()), 
-      grp_id(gid_Undef), _aend(clits.end()), _asize(clits.size()), 
-      _abstr(calculate_abstr())
+      grp_id(gid_Undef)
+    , _aend(clits.end()), _asize(clits.size()), _abstr(calculate_abstr())
   {
     assert(adjacent_find(lits.begin(),lits.end(),AbsLitGreater())==lits.end());
+    //sort_lits();
     NDBG(cout << "Creating clause: [" << *this << "]" << endl;);
   }
 
@@ -67,13 +72,32 @@ public:
   Literator end() { return clits.end(); }
   CLiterator end() const { return clits.end(); }
 
+  const vector<LINT>& cl_lits() const { return clits; }
+
+  ULINT get_min_lit() { return size() ? abs(clits[0]) : 0; }
+
+  ULINT get_max_lit() { return size() ? abs(clits[clits.size()-1]) : 0; }
+
+  bool is_tautology(void) { return adjacent_find(clits.begin(), clits.end(), LitNegated()) != clits.end(); }
+
 protected:
 
   void add_lit(LINT lit) {
     clits.push_back(lit);    // Currently sorts; it is simpler to insert & shift
     assert(clits.size() > 0);
     if (abs(lit) < abs(clits[clits.size()-1])) {
-      sort_lits();
+      sort_lits();    // alternatively: 
+      /*  => Seems to be less efficient
+	  Literator pos2 = clits.end();
+	  Literator pos1 = clits.end();
+	  --pos1;
+	  for (--pos1; abs(*pos1) > abs(lit); --pos1, --pos2) {
+	  *pos2 = *pos1;
+	  if (pos1 == clits.begin()) { break; }
+	  }
+	  *pos1 = lit;
+	  */
+      //update_internal_data((unsigned)lit);
     }
   }
 
@@ -82,13 +106,13 @@ protected:
       if (*pos == lit) { *pos = clits.back(); break; }
     }
     clits.pop_back();    // Currently sorts; it is simpler to insert & shift
+    //sort_lits();  // alternatively: 
+    //update_internal_data((unsigned)lit);   // hash XOR removes bits due to lit
   }
 
   vector<LINT>& cl_lits() { return clits; }
 
-  ULINT get_min_lit() { ULINT minid=abs(clits[0]); return minid; }
-
-  ULINT get_max_lit() { ULINT maxid=abs(clits[clits.size()-1]); return maxid; }
+  //ULINT clhash() { return hashval; }
 
 public:    // Weight/group/id functions
 
@@ -123,7 +147,7 @@ public:    // Output functions
   // debugging version: prints group ID in front of the clause
   void dump(ostream& outs=cout) const {
     outs << "[" << get_grp_id() << "] " << *this;
-    outs <<  "(r=" << removed() << ", asz=" << asize() << ")";
+    //outs <<  "(r=" << removed() << ", asz=" << asize() << ")";
   }
 
   friend ostream & operator << (ostream& outs, const BasicClause& cl) {
@@ -139,18 +163,42 @@ public:    // Output functions
 protected:
 
   void sort_lits() {
+    //cout << "Lits A: ";
+    //copy(clits.begin(), clits.end(), ostream_iterator<int>(cout, " "));
+    //cout << endl;
+    //if (!is_sorted(clits.begin(), clits.end(), AbsLitLess())) { }
     sort(clits.begin(), clits.end(), AbsLitLess());
+    //cout << "Lits B: ";
+    //copy(clits.begin(), clits.end(), ostream_iterator<int>(cout, " "));
+    //cout << endl;
   }
+
+  ULINT compute_hash() {    // Not being used: see below new hash functions
+    exit(0);
+    register ULINT hashv = 0;
+    for(vector<LINT>::iterator pos = clits.begin(); pos != clits.end(); ++pos) {
+      hashv ^= (*pos>0) ? *pos : -*pos;
+    }
+    return hashv;
+  }
+
+  //void update_internal_data(ULINT uval) { sort_lits(); hashval ^= uval; }
 
 protected:
 
   vector<LINT> clits;
 
+  //ULINT hashval;
+
   XLINT weight;
 
   ULINT id;
 
-  GID grp_id;
+  GID grp_id; // ANTON: the actual group ID, rather than using id
+
+  /* This part is added to support various pre-processing and simplification 
+   * techniques during MUS extraction. See comments at the top of this file.
+   */
 
 public: 
 
@@ -202,12 +250,6 @@ public:
     return res;
   }
 
-  /** Returns the abstraction of the clause */
-  ULINT abstr(void) const { return _abstr; }
-
-  /* Updates abstraction -- call when clause changes */
-  void update_abstr(void) { _abstr = calculate_abstr(); }
-
   /** Writes out the active part of the clause */
   std::ostream& awrite(std::ostream& outs = cout) const {
     for (CLiterator lpos = abegin(); lpos != aend(); ++lpos)
@@ -215,6 +257,46 @@ public:
     outs << "0";
     return outs;
   }
+
+  /** Returns the abstraction of the clause */
+  ULINT abstr(void) const { return _abstr; }
+
+  /* Updates abstraction -- call when clause changes */
+  void update_abstr(void) { _abstr = calculate_abstr(); }
+
+  /** Access to the counter of necessary variables */
+  const unsigned& nv_count(void) const { return _nv_count; }
+  unsigned& nv_count(void) { return _nv_count; }
+
+  /** Access to the counter of group 0 variables */
+  const unsigned& g0v_count(void) const { return _g0v_count; }
+  unsigned& g0v_count(void) { return _g0v_count; }
+
+  /** Access to the solver-ID of this clause */
+  const unsigned& ss_id(void) const { return _ss_id; }
+  unsigned& ss_id(void) { return _ss_id; }
+
+  // support for rotation/conflict graph navigation
+
+  /** Access to visited generation */
+  unsigned visited_gen(void) const { return _visited_gen; }
+  void set_visited_gen(unsigned visited_gen) { _visited_gen = visited_gen; }
+
+  /** Access to the incoming literal */
+  LINT incoming_lit(void) const { return _incoming_lit; }
+  void set_incoming_lit(LINT il) { _incoming_lit = il; }
+  
+  /** Access to the incoming parent */
+  BasicClause* incoming_parent(void) const { return _incoming_parent; }
+  void set_incoming_parent(BasicClause* ip) { _incoming_parent = ip; }
+
+  // support for SLS during model rotation
+
+  /** Access to the true count */
+  unsigned tl_count(void) const { return _tl_count; }
+  void set_tl_count(unsigned tc) { _tl_count = tc; }
+  unsigned inc_tl_count(void) { return ++_tl_count; }
+  unsigned dec_tl_count(void) { return --_tl_count; }
 
 protected:
 
@@ -231,7 +313,7 @@ protected:
   
   // various useful flags
   struct flags {
-    unsigned removed   : 1;     // 1 when the clause is removed (e.g. BCE or sat)
+    unsigned removed   : 1;     // 1 when the clause is removed
     unsigned unsorted  : 1;     // 1 when the clause might be un-sorted
     unsigned unused    : 30; 
     flags(void) { removed = 0; unsorted = 0; }
@@ -246,6 +328,37 @@ protected:
   size_t _asize;         // initially lits.size()
 
   ULINT _abstr;          // abstraction
+
+  unsigned _nv_count = 0;// count of necessary variables (needed for VMUS)
+
+  unsigned _g0v_count = 0;// count of group 0 variables (needed for VMUS)
+
+  unsigned _ss_id = 0;   // solver-ID of this clause
+
+  // support for rotation/conflict graph navigation
+
+  unsigned _visited_gen = 0;    // visited generation
+
+  LINT _incoming_lit = 0;       // literal through which we arrived
+
+  BasicClause* _incoming_parent = 0; // which clause did we come from
+
+  // support for SLS during model rotation
+
+  unsigned _tl_count = 0;       // number of true literals
+
+
+  // additions for Marijn's proof-compactor
+  //
+
+public:
+
+  LINT get_slit(void) const { return _slit; }
+  void set_slit(LINT slit) { _slit = slit; }
+
+protected:
+
+  LINT _slit = 0;    // selector literals for/in this clause
 
 };
 

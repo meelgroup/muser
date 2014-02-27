@@ -1,0 +1,34 @@
+
+This directory contains the BOLT integration of Armin Biere's picosat v 954.
+
+Towards the future automation of the process, here's the record of steps:
+
+0. you only need picosat.c and picosat.h
+
+1. rename picosat.c to picosat.cc and picosat.h to picosat.hh
+
+2. wrap the code in picosat.hh and in picosat.cc into namespace PicosatXXX { ... }
+
+3. replace #ifndef ... in picosat.hh with #pragma once
+
+4. replace "new (" with "picosat_new (" in picosat.cc (no quotes)
+
+5. replace "delete (" with "picosat_delete (" in picosat.cc
+
+6. replace "this" with "this_" in picosat.cc (e.g. with sed -i 's/this/_this/g' picosat.cc)
+
+7. copy picosat.cc to picosat-tr.cc and picosat.hh to picosat-tr.hh
+
+8. in picosat-tr.* change namespace PicosatXXX to PicosatXXXTR, and add
+
+#define TRACE
+
+to the top of picosat-tr.cc
+
+9. copy Makefile from here
+
+
+author: Anton Belov, May 2013
+
+
+

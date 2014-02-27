@@ -9,18 +9,21 @@
 # Basic definition variables (may be extended in each Makefile)
 #-------------------------------------------------------------------------------
 
-CC         = gcc -std=c++11
-CXX	   = g++ -std=c++11
+CC         = gcc
+CXX	       = g++ -std=c++11
+
+#CC        = clang
+#CXX	     = clang++ --analyze -std=c++11 -stdlib=libstdc++
 
 # Redefine build date (for CCM compilation mode (due to bug with ccmalloc)
 ifeq ($(mkm), ccm)
 BUILDDATE = $(shell date +'%Y-%b-%d-%R')    # Minor bug with ccmalloc
 endif
 
-MKDATE = $(shell date +'%Y%m%d')
+MKDATE     = $(shell date +'%Y%m%d')
 
 # Platform
-UNAME := $(shell uname)
+UNAME      = $(shell uname)
 
 YACCF      = $(basename $(wildcard *.y))
 YCSRC      =
@@ -38,23 +41,31 @@ CCSRCS     = $(wildcard *.c)
 CCHDRS     = $(wildcard *.h)
 SRCS       = $(YCSRC) $(LCSRC) $(CXXSRCS) $(CCSRCS)
 OBJS       = $(addsuffix .o, $(basename $(SRCS)))
-OBJS	   := $(EXTOBJS) $(OBJS)
+OBJS	     := $(EXTOBJS) $(OBJS)
 
 
-# If not on Mac OS X and asked for 32 bits, tweak
+# If asked for 32 bits tweak, otherwise 64 bit
 ifeq (, $(findstring Darwin, $(UNAME)))
      ifeq ($(m32), 1)
           CPPFLAGS += -m32
           LLIBS += -L/usr/lib32
      endif
+else
+     ifeq ($(m32), 1)
+          CPPFLAGS += -arch i386
+          LLIBS += 
+     else
+          CPPFLAGS += -arch x86_64
+     endif
 endif
 
 LLIBS += -L/usr/lib
-LLIBS += -L/opt/local/lib -L/sw/lib
+LLIBS += -L/opt/local/lib
+#LLIBS += -L/sw/lib
 LLIBS += -L.
 
 IDIRS += -I$(ROOT)/src/extutil/include
-LLIBS += -L$(ROOT)/src/extutil/lib
+#LLIBS += -L$(ROOT)/src/extutil/lib
 
 IDIRS += $(foreach l,$(INCS),-I$(SRCDIR)/$l)
 
@@ -87,24 +98,28 @@ LLIBDIRS += $(foreach l,$(EXTRALIBS),-L$(SRCDIR)/$l)
 # For Mac OS X, linking is dynamic; otherwise it is static
 ifeq (, $(findstring Darwin, $(UNAME)))
         LNKTYPE = -static
-else
-#       For Mac OS X, select the LLP64 data model
-	CPPFLAGS += -arch x86_64
-endif
-
-# Tweak for MUSer2: by default the linking is always dynamic (b/c of picosat), 
-# unless specifically asked for static
-ifeq ($(XTRGT), muser-2)
-     LNKTYPE = 
-     ifeq ($(static), 1)
-          LNKTYPE = -static
-     endif             
 endif
 
 # Decide which libraries to include
 ifeq ($(findstring gmp, $(xl)), gmp)
 	LLIBS += -lgmpxx -lgmp
 	CPPFLAGS += -DGMPDEF
+endif
+
+# Allow expert/extended mode compilation
+ifeq ($(xm), xp)
+  # Expert/extended mode compilation
+  CPPFLAGS += -DXPMODE -DXTMODE
+else
+  ifeq ($(xm), xt)
+    # Extended mode compilation
+    CPPFLAGS += -DXTMODE
+  else
+    ifeq ($(xm), comp)
+      # Competition mode compilation
+      CPPFLAGS += -DCOMPMODE
+    endif
+  endif
 endif
 
 # Define trace mode
@@ -131,12 +146,12 @@ else
           CPPFLAGS  += -ggdb3 -DFULLDEBUG -UNDEBUG -UNCHECK
         else
           ifeq ($(mkm), sts)
-		CPPFLAGS += -O3 -DNDEBUG -DNCHECK -DSTATISTICS
+		        CPPFLAGS += -O3 -DNDEBUG -DNCHECK -DSTATISTICS
           else
             ifeq ($(mkm), ass) # enable assertions only and keep symbols
                 CPPFLAGS += -ggdb3 -UNDEBUG -DNCHECK
             else # default
-		CPPFLAGS  += -O3 -DNDEBUG -DNCHECK
+		            CPPFLAGS  += -O3 -DNDEBUG -DNCHECK
           endif
         endif
       endif
@@ -147,11 +162,23 @@ endif
 
 LNKFLAGS += $(LLIBDIRS) $(LLIBS) $(LFLAGS)
 
+## NOTE: if you're running into weird problems it might be because there are 
+## symbols accross the static libraries. By default the linker will take the 
+## object code of the first one it sees and ignore the rest, and you will never 
+## know about it. Adding the code below, will make it to link in all of the
+## objects from each of the libraries, and so the linker will complain in case
+## there are dublicate symbols. 
+#ifeq (, $(findstring Darwin, $(UNAME)))
+#  LNKFLAGS += -Wl,--whole-archive $(LLIBDIRS) $(LLIBS) -Wl,--no-whole-archive
+#else
+#  LNKFLAGS += -Wl,-all_load $(LLIBDIRS) $(LLIBS)
+#endif
+
 # Compilation tweaks/silencers
 CPPFLAGS += -Wall -Wno-deprecated
 
 # other flags
-CPPFLAGS += -DBUILDDATE='"$(BUILDDATE)"' -DTOOLNAME='"$(XTRGT)"'
+CPPFLAGS += -DBUILDDATE='"$(BUILDDATE)"' -DTOOLNAME='"$(XTRGT)"' -DCOMMITID='"$(COMMITID)"'
 
 # By default must include global defs
 CPPFLAGS += -I. -I$(SRCDIR)/include -I$(SRCDIR)/stubs $(IDIRS)
@@ -199,6 +226,12 @@ endif
 endif
 endif
 
+#-------------------------------------------------------------------------------
+# Re-make an executable without checking libraries etc.
+#-------------------------------------------------------------------------------
+
+it: $(OBJS)
+	$(CXX) $(CPPFLAGS) $(LNKTYPE) -o $(XTRGT) $(OBJS) $(LNKFLAGS)
 
 #-------------------------------------------------------------------------------
 # Make libs
@@ -284,6 +317,8 @@ help:
 	@echo "'make clean': cleans object files associated with a target"
 	@echo "'make [all]': builds a tool. Available options:"
 	@echo "     mkm='XXX', where XXX is one of opt,chk,dbg,ccm,val,prof"
+	@echo "     xm='XXX', where XXX is one of none,xt,xp"
+	@echo "     xl='XXX', where XXX can include gmp z"
 	@echo "Notes:"
 	@echo "  mkm: compile mode, chk(CHECK), dbg(DEBUG), prof(PROFILE), etc"
 	@echo ""

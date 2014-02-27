@@ -16,9 +16,10 @@ namespace {
   const char* build_date = BUILDDATE;
   const char* toolname = "MUSer2";
   const char* output_file = "muser2-output"; // prefix only
-  const char* authorname = "Anton Belov (MUSer2), Joao Marques-Silva (MUSer)";
-  const char* authoremail = "[anton.belov,jpms]@ucd.ie";
+  const char* authorname = "Anton Belov, Joao Marques-Silva";
+  const char* authoremail = "anton@belov-mcdowell.com, jpms@ucd.ie";
   const char* contribs = "";
+  const char* commit_id = COMMITID;
 
 }
 

@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*\
  * File:        mus_extractor_del.hh
  *
- * Description: Class definition of MUS extractor.
+ * Description: Class definition of deletion-based MUS extractor.
  *
  * Author:      antonb
  * 
@@ -10,8 +10,8 @@
  *                                              Copyright (c) 2011, Anton Belov
 \*----------------------------------------------------------------------------*/
 
-#ifndef _MUS_EXTRACTOR_HH
-#define _MUS_EXTRACTOR_HH 1
+#ifndef _MUS_EXTRACTOR_DEL_HH
+#define _MUS_EXTRACTOR_DEL_HH 1
 
 #include "basic_group_set.hh"
 #include "compute_mus.hh"
@@ -39,16 +39,18 @@ public:
 
   // lifecycle
 
+  /* Warning: IDManager will be used during extraction -- if its shared, make 
+   * sure its multithread safe.
+   */
   MUSExtractor(IDManager& imgr, ToolConfig& conf, unsigned id = 0)
-    : Worker(id), _imgr(imgr), config(conf), _pschecker(NULL),
-      _cpu_time(0), _sat_calls(0), _rot_groups(0), _ref_groups(0)
+    : Worker(id), _imgr(imgr), config(conf)
   {}
 
   virtual ~MUSExtractor(void) {}
 
   // additional SAT checker -- if set before process(), then the checker will
-  // be used for extraction; this allows to re-use the clauses learned before
-  // extraction
+  // be (one of) the checkers used for extraction; this allows to re-use the
+  // clauses learned during pre-processing
   void set_sat_checker(SATChecker* pschecker) { _pschecker = pschecker; }
   SATChecker* sat_checker(void) { return _pschecker; }
 
@@ -60,10 +62,24 @@ public:
    */
   virtual bool process(ComputeMUS& cm);
 
+  // extra configuration
+
+  /* Sets the soft limit on elapsed CPU time (seconds). 0 means no limit. */
+  void set_cpu_time_limit(double limit) { _cpu_time_limit = limit; }
+
+  /** Sets the limit on the number of iteration, where an "iteration" is typically
+   * an iteration of the main loop of the algo. 0 means no limit. */
+  void set_iter_limit(unsigned limit) { _iter_limit = limit; }
+
   // statistics
 
   /* Returns the elapsed CPU time (seconds) */
   double cpu_time(void) const { return _cpu_time; }
+
+#ifdef MULTI_THREADED
+  /* Returns the elapsed wall-clock time (seconds) */
+  double wc_time(void) const { return _wc_time; }
+#endif
 
   /* Returns the number of actual calls to SAT solver */
   unsigned sat_calls(void) const { return _sat_calls; }
@@ -80,16 +96,24 @@ protected:
 
   ToolConfig& config;           // configuration (name is good for macros)
 
-  SATChecker* _pschecker;       // pointer to SAT checker (to reuse)
+  SATChecker* _pschecker = NULL;// pointer to SAT checker (to reuse)
 
-  double _cpu_time;             // elapsed CPU time (seconds) for extraction
+  double _cpu_time_limit = 0;   // soft limit on CPU time 
 
-  unsigned _sat_calls;          // number of calls to SAT solver
+  unsigned _iter_limit = 0;     // limit on the number of iterations
 
-  unsigned _rot_groups;         // groups detected by model rotation (if enabled)
+  double _cpu_time = 0;         // elapsed CPU time (seconds) for extraction
+
+  unsigned _sat_calls = 0;      // number of calls to SAT solver
+
+  unsigned _rot_groups = 0;     // groups detected by model rotation (if enabled)
+
+  unsigned _ref_groups = 0;     // groups removed with refinement
+
+#ifdef MULTI_THREADED
+  double _wc_time = 0;          // elapsed wall-clock time (seconds)
+#endif
   
-  unsigned _ref_groups;         // groups removed with refinement
-
 };
 
 #endif /* _MUS_EXTRACTOR_DEL_HH */

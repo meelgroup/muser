@@ -1,0 +1,139 @@
+
+Antons ubcsat 1.2 hacking notes related to the wrapper
+======================================================
+
+walksat = DefaultProcedures,
+          Flip+FalseClauseList,
+          PickWalkSatSKC @ ChooseCandidate
+
+walksat -w = DefaultProceduresW,
+             Flip+FalseClauseListW,
+             PickWalkSatSKCW @ ChooseCandidate
+
+DefaultProcedures = ReadCNF @ ReadInstance (removed and replaced with manual initialization),
+                    LitOccurence @ CreateData,
+                    CandidateList @ CreateData,
+                    InitVarsFromFile @ PreStart (removed and replaced with manual initialization),
+                    DefaultStateInfo = CreateDefaultStateInfo @ CreateStateInfo,
+                                       InitDefaultStateInfo @ InitStateInfo  
+                    DefaultInitVars @ InitData,
+                    DefaultFlip @ FlipCandidate,
+                    CheckTermination @ CheckTerminate
+
+
+DefaultProceduresW = same at above, except DefaultFlipW @ FlipCandidate
+
+BestFalse =  InitBestFalse @ PreRun,
+             UpdateBestFalse @ PostStep
+
+Important parameters:
+====================
+
+-alg -> sets sAlgName (def. ""), no triggers
+-w -> sets bWeighted (def. false), no triggers
+-runs -> sets iNumRuns (def. 1), no triggers
+-cutoff -> sets iCutoff (def. 100000), no triggers
+-timeout (max seconds per run) -> sets fTimeOut (def. 0.0f), triggers: CheckTimeout @ CheckTerminate
+-gtimeout (max seconds for all runs) -> sets fGlobalTimeOut (def. 0.0f), triggers: CheckTimeout @ CheckTerminate
+-systime (if true, use user+system) -> sets bUseSystemTime (def. 0), no triggers
+-timeres (check timeout every N steps) -> sets iTimeResolution (def. 1000), no triggers
+-noimprove -> sets iNoNoimprove (def. 0), triggers: NoImprove @ CheckTerminate (dep. on BestFalse)
+-drestart -> sets iStagnateRestart, triggers: CheckForRestarts @ CheckRestart,BestFalse
+-target -> sets iTarget (def. 0), no triggers
+-wtarget -> sets iTargetWeight (def. 0), no triggers
+-inst -> sets sFilenameIn (def. ""), no triggers
+-q -> sets bReportQuiet (def. 0), no triggers
+
+
+Important trigger functions and global variables (ubcsat-triggers.c)
+
+/***** Trigger ReadCNF *****/
+
+void ReadCNF();
+
+UINT32 iNumVars;
+UINT32 iNumClauses;
+UINT32 iNumLits;                // total number of literals
+
+UINT32 *aClauseLen;             // index = clause-ID [0...iNumClauses), value = clause length
+LITTYPE **pClauseLits;          // index = clause-ID, value = pointer to array of literals
+UINT32 iMaxClauseLen;
+
+UBIGINT *aClauseWeight;         // index = clause-ID, value = weight (1 for un-weighted)
+UBIGINT iTotalClauseWeight;     // total weight of clauses
+
+UINT32 iVARSTATELen;            //   iVARSTATELen = (iNumVars >> 3) + 1;
+                                //   if ((iNumVars & 0x07)==0) { iVARSTATELen--; }
+
+
+/***** Trigger LitOccurence *****/
+
+void CreateLitOccurence();
+
+UINT32 *aNumLitOcc;
+UINT32 *aLitOccData;
+UINT32 **pLitClause;
+
+
+/***** Trigger CandidateList *****/
+
+void CreateCandidateList();
+
+UINT32 *aCandidateList;
+UINT32 iNumCandidates;
+UINT32 iMaxCandidates;
+
+
+/***** Trigger InitVarsFromFile *****/
+/***** Trigger DefaultInitVars *****/
+  
+void InitVarsFromFile();
+void DefaultInitVars();
+
+UINT32 *aVarInit;
+UINT32 iInitVarFlip;
+BOOL bVarInitGreedy;
+
+
+/***** Trigger DefaultStateInfo *****/
+
+void CreateDefaultStateInfo();
+void InitDefaultStateInfo();
+
+UINT32 *aNumTrueLit;
+BOOL *aVarValue;
+UINT32 iNumFalse;
+UBIGINT iSumFalseWeight;
+
+
+/***** Trigger DefaultFlip[W] *****/
+
+void DefaultFlip();
+void DefaultFlipW();
+
+
+/***** Trigger CheckTermination *****/
+
+void CheckTermination();
+
+
+/***** Trigger FalseClauseList *****/
+/***** Trigger Flip+FalseClauseList[W] *****/
+
+void CreateFalseClauseList();
+void InitFalseClauseList();
+void UpdateFalseClauseList();
+void InitFalseClauseList();
+void FlipFalseClauseList();
+void FlipFalseClauseListW();
+
+UINT32 *aFalseList;
+UINT32 *aFalseListPos;
+UINT32 iNumFalseList;
+
+
+
+
+
+
+

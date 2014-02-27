@@ -2,6 +2,8 @@
 ##
 ## Author:   jpms, antonb
 ##
+## Note: make sure to pass extras=1 on command line
+##
 
 #-------------------------------------------------------------------------------
 # Define source root, the target name and include standard defs
@@ -13,10 +15,11 @@ ROOT = ../..
 
 TRGT = wraps-2
 
-INCS += include idman clset mus-2 # mus-2 only for basic_group_set.hh
-EXTINCS += minisat22-2
+CPPFLAGS += 
 
-EXTRALIBS += 
+INCS += includes idman clset wraps mus-2 # mus-2 only for basic_group_set.hh
+
+EXTRALIBS = 
 
 -include $(MKDIR)/makefile-common-defs
 

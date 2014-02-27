@@ -1,0 +1,71 @@
+muser2_api.o: muser2_api.cc muser2_api.hh muser2_api.h muser2_impl.hh \
+ ../../../src/mus-2/basic_group_set.hh ../../../src/include/globals.hh \
+ ../../../src/include/config.hh ../../../src/include/macros.hh \
+ ../../../src/include/dbg_prt.hh ../../../src/include/basic_types.h \
+ ../../../src/include/types.hh ../../../src/include/functors.hh \
+ ../../../src/include/err_utils.hh ../../../src/include/rusage.hh \
+ ../../../src/clset/basic_clause.hh ../../../src/clset/cl_id_manager.hh \
+ ../../../src/clset/cl_functors.hh ../../../src/clset/basic_clause.hh \
+ ../../../src/clset/cl_types.hh ../../../src/clset/cl_functors.hh \
+ ../../../src/clset/cl_registry.hh ../../../src/clset/cl_types.hh \
+ ../../../src/mus-2/mus_config.hh ../../../src/wraps/solver_config.hh \
+ ../../../src/idman/id_manager.hh ../../../src/mus-2/occs_list.hh \
+ ../../../src/mus-2/basic_group_set.hh ../../../src/mus-2/mus_config.hh \
+ ../../../src/mus-2/mus_data.hh ../../../src/mus-2/res_graph.hh \
+ ../../../src/mus-2/mus_extractor.hh ../../../src/mus-2/compute_mus.hh \
+ ../../../src/mus-2/mus_data.hh ../../../src/mus-2/work_item.hh \
+ ../../../src/mus-2/sat_checker.hh \
+ ../../../src/mus-2/check_group_status.hh ../../../src/include/types.hh \
+ ../../../src/mus-2/check_group_status_chunk.hh \
+ ../../../src/mus-2/check_range_status.hh \
+ ../../../src/mus-2/check_subset_status.hh \
+ ../../../src/mus-2/check_unsat.hh \
+ ../../../src/mus-2/check_vgroup_status.hh \
+ ../../../src/wraps-2/solver_factory.hh \
+ ../../../src/wraps-2/solver_wrapper.hh ../../../src/clset/basic_clset.hh \
+ ../../../src/clset/cl_registry.hh ../../../src/wraps/solver_utils.hh \
+ ../../../src/wraps/solver_ll_factory.hh \
+ ../../../src/wraps/solver_config.hh \
+ ../../../src/wraps/solver_ll_wrapper.hh \
+ ../../../src/wraps/solver_utils.hh \
+ ../../../src/wraps/solver_llni_factory.hh \
+ ../../../src/wraps/solver_llni_wrapper.hh \
+ ../../../src/wraps/solver_sls_factory.hh \
+ ../../../src/wraps/solver_sls_wrapper.hh \
+ ../../../src/mus-2/trim_group_set.hh ../../../src/mus-2/worker.hh
+muser2_impl.o: muser2_impl.cc muser2_impl.hh \
+ ../../../src/mus-2/basic_group_set.hh ../../../src/include/globals.hh \
+ ../../../src/include/config.hh ../../../src/include/macros.hh \
+ ../../../src/include/dbg_prt.hh ../../../src/include/basic_types.h \
+ ../../../src/include/types.hh ../../../src/include/functors.hh \
+ ../../../src/include/err_utils.hh ../../../src/include/rusage.hh \
+ ../../../src/clset/basic_clause.hh ../../../src/clset/cl_id_manager.hh \
+ ../../../src/clset/cl_functors.hh ../../../src/clset/basic_clause.hh \
+ ../../../src/clset/cl_types.hh ../../../src/clset/cl_functors.hh \
+ ../../../src/clset/cl_registry.hh ../../../src/clset/cl_types.hh \
+ ../../../src/mus-2/mus_config.hh ../../../src/wraps/solver_config.hh \
+ ../../../src/idman/id_manager.hh ../../../src/mus-2/occs_list.hh \
+ ../../../src/mus-2/basic_group_set.hh ../../../src/mus-2/mus_config.hh \
+ ../../../src/mus-2/mus_data.hh ../../../src/mus-2/res_graph.hh \
+ ../../../src/mus-2/mus_extractor.hh ../../../src/mus-2/compute_mus.hh \
+ ../../../src/mus-2/mus_data.hh ../../../src/mus-2/work_item.hh \
+ ../../../src/mus-2/sat_checker.hh \
+ ../../../src/mus-2/check_group_status.hh ../../../src/include/types.hh \
+ ../../../src/mus-2/check_group_status_chunk.hh \
+ ../../../src/mus-2/check_range_status.hh \
+ ../../../src/mus-2/check_subset_status.hh \
+ ../../../src/mus-2/check_unsat.hh \
+ ../../../src/mus-2/check_vgroup_status.hh \
+ ../../../src/wraps-2/solver_factory.hh \
+ ../../../src/wraps-2/solver_wrapper.hh ../../../src/clset/basic_clset.hh \
+ ../../../src/clset/cl_registry.hh ../../../src/wraps/solver_utils.hh \
+ ../../../src/wraps/solver_ll_factory.hh \
+ ../../../src/wraps/solver_config.hh \
+ ../../../src/wraps/solver_ll_wrapper.hh \
+ ../../../src/wraps/solver_utils.hh \
+ ../../../src/wraps/solver_llni_factory.hh \
+ ../../../src/wraps/solver_llni_wrapper.hh \
+ ../../../src/wraps/solver_sls_factory.hh \
+ ../../../src/wraps/solver_sls_wrapper.hh \
+ ../../../src/mus-2/trim_group_set.hh ../../../src/mus-2/worker.hh \
+ muser2_api.hh

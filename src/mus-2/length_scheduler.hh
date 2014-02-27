@@ -20,7 +20,7 @@
 
 /*----------------------------------------------------------------------------*\
  * Class:  LengthScheduler
- *
+ * 
  * Purpose: Scheduler for clauses/groups of clauses based on lengths.
  *
  * Notes:
@@ -38,7 +38,7 @@ private:
   class GIDLenCompare {
     const BasicGroupSet& _gs;           // reference to the groupset
     unsigned _order;                    // order
-public:
+  public:
     // order = 1 means longest first, order = 2 means shortest first
     GIDLenCompare(const BasicGroupSet& gs, unsigned order) 
       : _gs(gs), _order(order) {}
@@ -70,8 +70,8 @@ public:
     for (gset_iterator pg = md.gset().gbegin(); pg != md.gset().gend(); ++pg) {
       if (*pg != 0)
         _q.push(*pg);
-      }
     }
+  }
 
   /** Returns true and sets the next group id for a given worker ID
    * [0,num_workers) if there's more groups; otherwise false
@@ -99,7 +99,7 @@ public:
     _q.push(gid);
   }
 
-  };
+};
 
 #endif // _LENGTH_SCHEDULER_HH
 

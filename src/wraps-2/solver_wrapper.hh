@@ -4,41 +4,33 @@
  *
  * Description: General SAT solver wrapper & SAT solver factory.
  *
- * Author:      jpms, antonb
+ * Author:      jpms
  * 
+ * Modifications:
+ *
+ *    antonb - fixed and added group-based interface methods; rewrote completely.
+ *
  * Notes:
- *    the default implementation of most of the methods just throws exceptions;
+ *    (1) the default implementation of most of the methods just throws exceptions;
  *    this is done because the actual wrappers might differ significantly in the
  *    set of supported functionality.
  *
- *                        Copyright (c) 2010-12, Joao Marques-Silva, Anton Belov
+ *    (2) the class is wrapped into MUSer2 namespace to avoid conflicts with
+ *    wraps/. I think this needs to be completely re-designed.
+ *
+ *                        Copyright (c) 2010-13, Joao Marques-Silva, Anton Belov
 \*----------------------------------------------------------------------------*/
 //jpms:ec
 
-#ifndef _SOLVER_WRAPPER_H
-#define _SOLVER_WRAPPER_H 1
+#pragma once
 
 #include <stdexcept>
-#include "globals.hh"
-#include "id_manager.hh"
 #include "basic_clset.hh"
 #include "basic_group_set.hh"
+#include "id_manager.hh"
 #include "solver_utils.hh"
 
-using namespace SolverUtils;
-
-//jpms:bc
-/*----------------------------------------------------------------------------*\
- * Basic defs
-\*----------------------------------------------------------------------------*/
-//jpms:ec
-
-typedef enum SAT_Result {
-  SAT_NoRes = 0x0000,    // Default value: no result
-  SAT_True  = 0x2000,    // Instance is satisfiable
-  SAT_False = 0x2001,    // Instance is unsatisfiable
-  SAT_Abort = 0x2002,    // Resources exceeded
-} SATRes;
+namespace MUSer2 {
 
 class SATSolverFactory;
 
@@ -78,6 +70,29 @@ public: // The main interface methods -- this is the minimal set of methods that
    */
   virtual SATRes solve(const IntVector& assum) = 0;
 
+public: // Additional non-mandatory functionality
+
+  /** Returns true if this solver knows to do preprocessing; if this is overriden,
+   * then preprocess() should be implemented.
+   */
+  virtual bool is_preprocessing(void) { return false; }
+
+  /** Preprocess the current set of clauses. If turn_off is set to true, no
+   * further preprocessing is possible; this might allow some solvers to release
+   * resources.
+   * @return SAT_True, SAT_False, SAT_NoRes depending on the results of prepro.
+   */
+  virtual SATRes preprocess(bool turn_off = false) {
+    tool_abort("preprocess() is not implemented for this solver.");
+    return SAT_NoRes;
+  }
+
+  /** Returns the activity of the specified variable
+   */
+  virtual double get_activity(ULINT var) {
+    throw std::logic_error("method is not implemented");
+  }
+
 public: // Configuration methods
 
   /* Verbosity -- usually passed to solver */
@@ -98,17 +113,38 @@ public: // Configuration methods
     throw std::logic_error("method is not implemented");
   }     
 
+  /* Sets the preferred phase for a particular variable: 0 - false, 1 - true
+   */
+  virtual void set_phase(ULINT var, LINT phase) {
+    throw std::logic_error("method is not implemented");
+  }
+
+  /* Sets the maximum number of conflicts per call. Note that this affects
+   * completeness. -1 = no maximum.
+   */
+  virtual void set_max_conflicts(LINT max_conflicts) {
+    throw std::logic_error("method is not implemented");
+  }
+
+  /* Sets the timeout per call in seconds. 0 = no timeout
+   */
+  virtual void set_timeout(float to) {
+    throw std::logic_error("method is not implemented");
+  }
+
+  /** Some incremental solvers implement optimizations that require the knowledge
+   * of which variables are selectors. This method allows to set the largest
+   * variable ID of problem variables (i.e. everything above that is a selector)
+   */
+  virtual void set_max_problem_var(ULINT pvar) { }
+
 public:   // Access result of SAT solver call
 
   /* Returns the reference to the model (r/w) */
-  virtual IntVector& get_model(void) { return model; }
+  virtual IntVector& get_model(void) = 0;
 
   /* Makes a copy of the model (resized as needed) */
-  virtual void get_model(IntVector& rmodel) {
-    if (rmodel.size() < model.size())
-      rmodel.resize(model.size(), 0);
-    copy(model.begin(), model.end(), rmodel.begin());
-  }
+  virtual void get_model(IntVector& rmodel) = 0;
 
   /* Returns the reference to a clausal unsat core */
   virtual BasicClauseVector& get_unsat_core(void) {
@@ -248,23 +284,26 @@ public:  // Miscellaneous (stats, printing, etc)
     throw std::logic_error("method is not implemented");
   }
 
+  /** This method can be implemented to give access to the underlying SAT
+   * solver instance. This may be useful to tweak some solver-specific low-level
+   * configuation parameters.
+   */
+  virtual void* get_raw_solver_ptr(void) {
+    throw std::logic_error("method is not implemented");
+  }
 
 protected: // Constructor/destructor -- to be used from factory only
 
-  SATSolverWrapper(IDManager& _imgr) :
-    imgr(_imgr), model() {}
+  SATSolverWrapper(IDManager& _imgr) : imgr(_imgr) {}
 
-  virtual ~SATSolverWrapper(void) { }
+  virtual ~SATSolverWrapper(void) {}
 
 protected:
 
   IDManager& imgr;                      // id manager
 
-  IntVector model;                      // to keep the model
-
 };
 
-
-#endif /* _SOLVER_WRAPPER_H */
+} // namespace MUSer2
 
 /*----------------------------------------------------------------------------*/

@@ -1,0 +1,9 @@
+# Author: Anton Belov, June 2013
+
+This directory contains the BOLT integration of glucose 2.2.0. If you need to update 
+sources: put the originals into orig-dist, and then run
+
+$ python import-orig-dist.py
+
+It will do everything for you.
+

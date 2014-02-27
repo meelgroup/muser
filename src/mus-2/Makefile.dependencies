@@ -1,122 +1,481 @@
-mus_extraction_alg_del.o: mus_extraction_alg_del.cc basic_group_set.hh \
- ../../src/include/globals.hh ../../src/include/macros.hh \
- ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
- ../../src/include/types.hh ../../src/include/err_utils.hh \
- ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
- ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
- ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
- ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
- ../../src/clset/cl_types.hh mus_config.hh \
- ../../src/wraps-2/solver_config.hh ../../src/idman/id_manager.hh \
- occs_list.hh mus_extraction_alg.hh group_scheduler.hh mus_data.hh \
- model_rotator.hh ../../src/clset/basic_clset.hh \
- ../../src/clset/cl_registry.hh rotate_model.hh \
- ../../src/include/types.hh work_item.hh worker.hh sat_checker.hh \
- check_group_status.hh check_range_status.hh check_unsat.hh \
- ../../src/wraps-2/solver_factory.hh ../../src/wraps-2/solver_config.hh \
- ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
- ../../src/wraps-2/solver_utils.hh ../../src/wraps-2/solver_wrapper.hh \
- trim_group_set.hh
-mus_extraction_alg_dich.o: mus_extraction_alg_dich.cc basic_group_set.hh \
- ../../src/include/globals.hh ../../src/include/macros.hh \
- ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
- ../../src/include/types.hh ../../src/include/err_utils.hh \
- ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
- ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
- ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
- ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
- ../../src/clset/cl_types.hh mus_config.hh \
- ../../src/wraps-2/solver_config.hh ../../src/idman/id_manager.hh \
- occs_list.hh check_range_status.hh mus_data.hh \
- ../../src/include/types.hh work_item.hh mus_extraction_alg.hh \
- group_scheduler.hh model_rotator.hh ../../src/clset/basic_clset.hh \
- ../../src/clset/cl_registry.hh rotate_model.hh worker.hh sat_checker.hh \
- check_group_status.hh check_unsat.hh ../../src/wraps-2/solver_factory.hh \
- ../../src/wraps-2/solver_config.hh ../../src/wraps-2/solver_wrapper.hh \
- basic_group_set.hh ../../src/wraps-2/solver_utils.hh \
- ../../src/wraps-2/solver_wrapper.hh trim_group_set.hh
-mus_extraction_alg_ins.o: mus_extraction_alg_ins.cc basic_group_set.hh \
- ../../src/include/globals.hh ../../src/include/macros.hh \
- ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
- ../../src/include/types.hh ../../src/include/err_utils.hh \
- ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
- ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
- ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
- ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
- ../../src/clset/cl_types.hh mus_config.hh \
- ../../src/wraps-2/solver_config.hh ../../src/idman/id_manager.hh \
- occs_list.hh check_range_status.hh mus_data.hh \
- ../../src/include/types.hh work_item.hh mus_extraction_alg.hh \
- group_scheduler.hh model_rotator.hh ../../src/clset/basic_clset.hh \
- ../../src/clset/cl_registry.hh rotate_model.hh worker.hh sat_checker.hh \
- check_group_status.hh check_unsat.hh ../../src/wraps-2/solver_factory.hh \
- ../../src/wraps-2/solver_config.hh ../../src/wraps-2/solver_wrapper.hh \
- basic_group_set.hh ../../src/wraps-2/solver_utils.hh \
- ../../src/wraps-2/solver_wrapper.hh trim_group_set.hh
-mus_extractor.o: mus_extractor.cc basic_group_set.hh \
- ../../src/include/globals.hh ../../src/include/macros.hh \
- ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
- ../../src/include/types.hh ../../src/include/err_utils.hh \
- ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
- ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
- ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
- ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
- ../../src/clset/cl_types.hh mus_config.hh \
- ../../src/wraps-2/solver_config.hh ../../src/idman/id_manager.hh \
- occs_list.hh group_scheduler.hh mus_data.hh length_scheduler.hh \
- linear_scheduler.hh mus_extractor.hh compute_mus.hh work_item.hh \
- sat_checker.hh check_group_status.hh ../../src/include/types.hh \
- check_range_status.hh check_unsat.hh ../../src/wraps-2/solver_factory.hh \
- ../../src/wraps-2/solver_config.hh ../../src/wraps-2/solver_wrapper.hh \
- ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
- basic_group_set.hh ../../src/wraps-2/solver_utils.hh \
- ../../src/wraps-2/solver_wrapper.hh trim_group_set.hh worker.hh \
- mus_extraction_alg.hh model_rotator.hh rotate_model.hh \
- random_scheduler.hh
-recursive_model_rotator.o: recursive_model_rotator.cc basic_group_set.hh \
- ../../src/include/globals.hh ../../src/include/macros.hh \
- ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
- ../../src/include/types.hh ../../src/include/err_utils.hh \
- ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
- ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
- ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
- ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
- ../../src/clset/cl_types.hh mus_config.hh \
- ../../src/wraps-2/solver_config.hh ../../src/idman/id_manager.hh \
- occs_list.hh ../../src/include/types.hh model_rotator.hh \
- ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
- mus_data.hh rotate_model.hh work_item.hh worker.hh
-sat_checker.o: sat_checker.cc sat_checker.hh basic_group_set.hh \
- ../../src/include/globals.hh ../../src/include/macros.hh \
- ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
- ../../src/include/types.hh ../../src/include/err_utils.hh \
- ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
- ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
- ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
- ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
- ../../src/clset/cl_types.hh mus_config.hh \
- ../../src/wraps-2/solver_config.hh ../../src/idman/id_manager.hh \
- occs_list.hh check_group_status.hh mus_data.hh \
- ../../src/include/types.hh work_item.hh check_range_status.hh \
- check_unsat.hh ../../src/wraps-2/solver_factory.hh \
- ../../src/wraps-2/solver_config.hh ../../src/wraps-2/solver_wrapper.hh \
- ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
- basic_group_set.hh ../../src/wraps-2/solver_utils.hh \
- ../../src/wraps-2/solver_wrapper.hh trim_group_set.hh worker.hh
-tester.o: tester.cc basic_group_set.hh ../../src/include/globals.hh \
+bce_simplifier.o: bce_simplifier.cc \
+ ../../src/extsrc/minisat22/mtl/mheap.hh \
+ ../../src/extsrc/minisat22/mtl/vec.hh \
+ ../../src/extsrc/minisat22/mtl/int_types.hh \
+ ../../src/extsrc/minisat22/mtl/xalloc.hh basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
  ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
  ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh bce_simplifier.hh ../../src/clset/basic_clset.hh \
+ ../../src/clset/cl_registry.hh simplify_bce.hh mus_data.hh res_graph.hh \
+ work_item.hh worker.hh ../../src/include/types.hh
+bcp_simplifier.o: bcp_simplifier.cc \
+ ../../src/extsrc/minisat22/mtl/queue.hh \
+ ../../src/extsrc/minisat22/mtl/vec.hh \
+ ../../src/extsrc/minisat22/mtl/int_types.hh \
+ ../../src/extsrc/minisat22/mtl/xalloc.hh basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh bcp_simplifier.hh simplify_bcp.hh mus_data.hh res_graph.hh \
+ work_item.hh worker.hh ../../src/include/types.hh
+extended_model_rotator.o: extended_model_rotator.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh ../../src/include/types.hh model_rotator.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ mus_data.hh res_graph.hh rotate_model.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh
+intel_model_rotator.o: intel_model_rotator.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh ../../src/include/types.hh model_rotator.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ mus_data.hh res_graph.hh rotate_model.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh utils.hh
+intel_model_rotator2.o: intel_model_rotator2.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh ../../src/include/types.hh model_rotator.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ mus_data.hh res_graph.hh rotate_model.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh utils.hh
+irr_model_rotator.o: irr_model_rotator.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh ../../src/include/types.hh model_rotator.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ mus_data.hh res_graph.hh rotate_model.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh
+mus_extraction_alg_chunk.o: mus_extraction_alg_chunk.cc \
+ basic_group_set.hh ../../src/include/globals.hh \
+ ../../src/include/config.hh ../../src/include/macros.hh \
+ ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
+ ../../src/include/types.hh ../../src/include/functors.hh \
  ../../src/include/err_utils.hh ../../src/include/rusage.hh \
  ../../src/clset/basic_clause.hh ../../src/clset/cl_id_manager.hh \
  ../../src/clset/cl_functors.hh ../../src/clset/basic_clause.hh \
  ../../src/clset/cl_types.hh ../../src/clset/cl_functors.hh \
  ../../src/clset/cl_registry.hh ../../src/clset/cl_types.hh mus_config.hh \
- ../../src/wraps-2/solver_config.hh ../../src/idman/id_manager.hh \
- occs_list.hh check_unsat.hh mus_data.hh work_item.hh compute_mus.hh \
- mus_extractor.hh sat_checker.hh check_group_status.hh \
- ../../src/include/types.hh check_range_status.hh \
- ../../src/wraps-2/solver_factory.hh ../../src/wraps-2/solver_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh mus_extraction_alg.hh group_scheduler.hh mus_data.hh \
+ res_graph.hh model_rotator.hh ../../src/clset/basic_clset.hh \
+ ../../src/clset/cl_registry.hh rotate_model.hh \
+ ../../src/include/types.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh sat_checker.hh \
+ check_group_status.hh check_group_status_chunk.hh check_range_status.hh \
+ check_subset_status.hh check_unsat.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh
+mus_extraction_alg_del.o: mus_extraction_alg_del.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh mus_extraction_alg.hh group_scheduler.hh mus_data.hh \
+ res_graph.hh model_rotator.hh ../../src/clset/basic_clset.hh \
+ ../../src/clset/cl_registry.hh rotate_model.hh \
+ ../../src/include/types.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh sat_checker.hh \
+ check_group_status.hh check_group_status_chunk.hh check_range_status.hh \
+ check_subset_status.hh check_unsat.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh
+mus_extraction_alg_dich.o: mus_extraction_alg_dich.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh check_range_status.hh mus_data.hh res_graph.hh \
+ ../../src/include/types.hh work_item.hh mus_extraction_alg.hh \
+ group_scheduler.hh model_rotator.hh ../../src/clset/basic_clset.hh \
+ ../../src/clset/cl_registry.hh rotate_model.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh sat_checker.hh \
+ check_group_status.hh check_group_status_chunk.hh check_subset_status.hh \
+ check_unsat.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh
+mus_extraction_alg_fbar.o: mus_extraction_alg_fbar.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh mus_extraction_alg_fbar.hh mus_extraction_alg.hh \
+ group_scheduler.hh mus_data.hh res_graph.hh model_rotator.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ rotate_model.hh ../../src/include/types.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh sat_checker.hh \
+ check_group_status.hh check_group_status_chunk.hh check_range_status.hh \
+ check_subset_status.hh check_unsat.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh rgraph_utils.hh \
+ utils.hh
+mus_extraction_alg_ins.o: mus_extraction_alg_ins.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh check_range_status.hh mus_data.hh res_graph.hh \
+ ../../src/include/types.hh work_item.hh mus_extraction_alg.hh \
+ group_scheduler.hh model_rotator.hh ../../src/clset/basic_clset.hh \
+ ../../src/clset/cl_registry.hh rotate_model.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh sat_checker.hh \
+ check_group_status.hh check_group_status_chunk.hh check_subset_status.hh \
+ check_unsat.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh
+mus_extraction_alg_prog.o: mus_extraction_alg_prog.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh mus_extraction_alg_prog.hh check_range_status.hh \
+ mus_data.hh res_graph.hh ../../src/include/types.hh work_item.hh \
+ mus_extraction_alg.hh group_scheduler.hh model_rotator.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ rotate_model.hh ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh sat_checker.hh \
+ check_group_status.hh check_group_status_chunk.hh check_subset_status.hh \
+ check_unsat.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh utils.hh
+mus_extraction_alg_subset.o: mus_extraction_alg_subset.cc \
+ basic_group_set.hh ../../src/include/globals.hh \
+ ../../src/include/config.hh ../../src/include/macros.hh \
+ ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
+ ../../src/include/types.hh ../../src/include/functors.hh \
+ ../../src/include/err_utils.hh ../../src/include/rusage.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_id_manager.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_types.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/cl_registry.hh ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh mus_extraction_alg.hh group_scheduler.hh mus_data.hh \
+ res_graph.hh model_rotator.hh ../../src/clset/basic_clset.hh \
+ ../../src/clset/cl_registry.hh rotate_model.hh \
+ ../../src/include/types.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh sat_checker.hh \
+ check_group_status.hh check_group_status_chunk.hh check_range_status.hh \
+ check_subset_status.hh check_unsat.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh \
+ trace_analyzer.hh
+mus_extraction_alg_subset2.o: mus_extraction_alg_subset2.cc \
+ basic_group_set.hh ../../src/include/globals.hh \
+ ../../src/include/config.hh ../../src/include/macros.hh \
+ ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
+ ../../src/include/types.hh ../../src/include/functors.hh \
+ ../../src/include/err_utils.hh ../../src/include/rusage.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_id_manager.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_types.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/cl_registry.hh ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh mus_extraction_alg.hh group_scheduler.hh mus_data.hh \
+ res_graph.hh model_rotator.hh ../../src/clset/basic_clset.hh \
+ ../../src/clset/cl_registry.hh rotate_model.hh \
+ ../../src/include/types.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh sat_checker.hh \
+ check_group_status.hh check_group_status_chunk.hh check_range_status.hh \
+ check_subset_status.hh check_unsat.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh
+mus_extractor.o: mus_extractor.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh group_scheduler.hh mus_data.hh res_graph.hh \
+ length_scheduler.hh length_vscheduler.hh linear_scheduler.hh \
+ linear_vscheduler.hh mus_extractor.hh compute_mus.hh work_item.hh \
+ sat_checker.hh check_group_status.hh ../../src/include/types.hh \
+ check_group_status_chunk.hh check_range_status.hh check_subset_status.hh \
+ check_unsat.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps-2/solver_wrapper.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ basic_group_set.hh ../../src/wraps/solver_utils.hh \
+ ../../src/wraps/solver_ll_factory.hh ../../src/wraps/solver_config.hh \
+ ../../src/wraps/solver_ll_wrapper.hh ../../src/wraps/solver_utils.hh \
+ ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh worker.hh \
+ mus_extraction_alg.hh model_rotator.hh rotate_model.hh \
+ mus_extraction_alg_fbar.hh mus_extraction_alg_prog.hh \
+ random_scheduler.hh rgraph_scheduler.hh order_scheduler.hh \
+ ../../src/extsrc/minisat22/mtl/mheap.hh \
+ ../../src/extsrc/minisat22/mtl/vec.hh \
+ ../../src/extsrc/minisat22/mtl/int_types.hh \
+ ../../src/extsrc/minisat22/mtl/xalloc.hh utils.hh
+recursive_model_rotator.o: recursive_model_rotator.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh ../../src/include/types.hh model_rotator.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ mus_data.hh res_graph.hh rotate_model.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh utils.hh
+res_graph.o: res_graph.cc res_graph.hh ../../src/clset/basic_clause.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/cl_id_manager.hh \
+ basic_group_set.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh utils.hh
+sat_checker.o: sat_checker.cc sat_checker.hh basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh check_group_status.hh mus_data.hh res_graph.hh \
+ ../../src/include/types.hh work_item.hh check_group_status_chunk.hh \
+ check_range_status.hh check_subset_status.hh check_unsat.hh \
+ check_vgroup_status.hh ../../src/wraps-2/solver_factory.hh \
  ../../src/wraps-2/solver_wrapper.hh ../../src/clset/basic_clset.hh \
  ../../src/clset/cl_registry.hh basic_group_set.hh \
- ../../src/wraps-2/solver_utils.hh ../../src/wraps-2/solver_wrapper.hh \
- trim_group_set.hh worker.hh tester.hh test_mus.hh
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh worker.hh \
+ utils.hh
+tester.o: tester.cc basic_group_set.hh ../../src/include/globals.hh \
+ ../../src/include/config.hh ../../src/include/macros.hh \
+ ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
+ ../../src/include/types.hh ../../src/include/functors.hh \
+ ../../src/include/err_utils.hh ../../src/include/rusage.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_id_manager.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_types.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/cl_registry.hh ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh check_unsat.hh mus_data.hh res_graph.hh work_item.hh \
+ compute_mus.hh mus_extractor.hh sat_checker.hh check_group_status.hh \
+ ../../src/include/types.hh check_group_status_chunk.hh \
+ check_range_status.hh check_subset_status.hh check_vgroup_status.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps-2/solver_wrapper.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ basic_group_set.hh ../../src/wraps/solver_utils.hh \
+ ../../src/wraps/solver_ll_factory.hh ../../src/wraps/solver_config.hh \
+ ../../src/wraps/solver_ll_wrapper.hh ../../src/wraps/solver_utils.hh \
+ ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh worker.hh \
+ tester.hh test_irr.hh test_mus.hh test_vmus.hh utils.hh
+trace_analyzer.o: trace_analyzer.cc trace_analyzer.hh
+utils.o: utils.cc ../../src/include/globals.hh \
+ ../../src/include/config.hh ../../src/include/macros.hh \
+ ../../src/include/dbg_prt.hh ../../src/include/basic_types.h \
+ ../../src/include/types.hh ../../src/include/functors.hh \
+ ../../src/include/err_utils.hh ../../src/include/rusage.hh utils.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_id_manager.hh \
+ basic_group_set.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh
+ve_simplifier.o: ve_simplifier.cc ../../src/extsrc/minisat22/mtl/mheap.hh \
+ ../../src/extsrc/minisat22/mtl/vec.hh \
+ ../../src/extsrc/minisat22/mtl/int_types.hh \
+ ../../src/extsrc/minisat22/mtl/xalloc.hh \
+ ../../src/extsrc/minisat22/mtl/queue.hh basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh ve_simplifier.hh simplify_ve.hh mus_data.hh res_graph.hh \
+ work_item.hh worker.hh ../../src/include/types.hh
+vmus_extraction_alg_del.o: vmus_extraction_alg_del.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh check_vgroup_status.hh mus_data.hh res_graph.hh \
+ ../../src/include/types.hh work_item.hh mus_extraction_alg.hh \
+ group_scheduler.hh model_rotator.hh ../../src/clset/basic_clset.hh \
+ ../../src/clset/cl_registry.hh rotate_model.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh sat_checker.hh \
+ check_group_status.hh check_group_status_chunk.hh check_range_status.hh \
+ check_subset_status.hh check_unsat.hh \
+ ../../src/wraps-2/solver_factory.hh ../../src/wraps/solver_ll_factory.hh \
+ ../../src/wraps/solver_config.hh ../../src/wraps/solver_ll_wrapper.hh \
+ ../../src/wraps/solver_utils.hh ../../src/wraps/solver_llni_factory.hh \
+ ../../src/wraps/solver_llni_wrapper.hh \
+ ../../src/wraps/solver_sls_factory.hh \
+ ../../src/wraps/solver_sls_wrapper.hh trim_group_set.hh
+vmus_model_rotator.o: vmus_model_rotator.cc basic_group_set.hh \
+ ../../src/include/globals.hh ../../src/include/config.hh \
+ ../../src/include/macros.hh ../../src/include/dbg_prt.hh \
+ ../../src/include/basic_types.h ../../src/include/types.hh \
+ ../../src/include/functors.hh ../../src/include/err_utils.hh \
+ ../../src/include/rusage.hh ../../src/clset/basic_clause.hh \
+ ../../src/clset/cl_id_manager.hh ../../src/clset/cl_functors.hh \
+ ../../src/clset/basic_clause.hh ../../src/clset/cl_types.hh \
+ ../../src/clset/cl_functors.hh ../../src/clset/cl_registry.hh \
+ ../../src/clset/cl_types.hh mus_config.hh \
+ ../../src/wraps/solver_config.hh ../../src/idman/id_manager.hh \
+ occs_list.hh ../../src/include/types.hh model_rotator.hh \
+ ../../src/clset/basic_clset.hh ../../src/clset/cl_registry.hh \
+ mus_data.hh res_graph.hh rotate_model.hh work_item.hh \
+ ../../src/wraps-2/solver_wrapper.hh basic_group_set.hh \
+ ../../src/wraps/solver_utils.hh worker.hh

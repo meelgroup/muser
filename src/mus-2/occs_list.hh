@@ -7,8 +7,9 @@
  * Author:      antonb
  * 
  * Notes:
- *      1. TODO: important -- provide iterators that automatically drop the
- *         removed clauses.
+ *      1. IMPORTANT: this implementation is NOT multi-thread safe.
+ *      2. TODO: important -- provide iterators that automatically drop the
+ *         removed clauses. And make an MT-safe version !!!!
  *      3. TODO: possibly lits to groups ? groups to lits ? 
  *
  *                                              Copyright (c) 2011, Anton Belov
@@ -32,10 +33,9 @@
  *
  *  1. Currently: map from literals to clauses they appear in. Note that the 
  *  clauses might be marked as deleted -- one key performance-related aspect 
- *  is the ability of knowing the number of actual (i.e. non-removed) clauses 
- *  for each literal without performing a cleanup. 
- *  
- * 2. The _i versions of methods take the *index* of literal, rather than the
+ *  (e.g for BCE) is the ability of knowing the number of actual (i.e. 
+ *  non-removed) clauses for each literal without performing a cleanup. 
+ *  The _i versions of methods take the *index* of literal, rather than the
  *  literal itself, directly.
  *
 \*----------------------------------------------------------------------------*/

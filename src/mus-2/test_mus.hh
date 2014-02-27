@@ -62,7 +62,7 @@ public: // Result
     }
     return outs.str();
   }
-
+ 
 public: // Statistics
 
   /* Returns the elapsed CPU time (seconds) */
@@ -82,7 +82,7 @@ protected:
   MUSData& _md;                  // MUS data
 
   Result _result;                // true when it is an MUS
-
+  
   double _cpu_time;             // elapsed CPU time (seconds) for testing
 
   unsigned _sat_calls;          // number of calls to SAT solver

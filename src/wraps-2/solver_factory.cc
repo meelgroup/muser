@@ -4,17 +4,19 @@
  *
  * Description: SAT solver object factory implementation
  *
- * Author:      jpms, antonb
+ * Author:      antonb; original: jmps
+ *
+ * Notes:       this is a MUSer2 factory that creates group wrappers around the
+ *              low-level wrappers from wraps/
  * 
- *                      Copyright (c) 2010-2011, Joao Marques-Silva, Anton Belov
+ *                      Copyright (c) 2010-2013, Joao Marques-Silva, Anton Belov
 \*----------------------------------------------------------------------------*/
 //jpms:ec
 
-#include "solver_config.hh"
 #include "solver_factory.hh"
-#include "solver_wrapper.hh"
-// solver-specific wrappers start here ...
-#include "minisat22_wrapper_gincr.hh"
+#include "solver_wrapper_gincr.hh"
+#include "solver_wrapper_gnonincr.hh"
+#include "solver_wrapper_gsls.hh"
 
 /*----------------------------------------------------------------------------*\
  * Purpose: the factory method that creates a SAT solver object given
@@ -22,23 +24,21 @@
 \*----------------------------------------------------------------------------*/
 //jpms:ec
 
-SATSolverWrapper& SATSolverFactory::instance(SATSolverConfig& config)
+MUSer2::SATSolverWrapper& MUSer2::SATSolverFactory::instance(SATSolverConfig& config)
 {
-  if (solver != NULL)
-    return *solver;
+  if (_solver != nullptr) { return *_solver; }
 
-  if (config.get_incr_mode()) { // Run in incremental mode
-    // group-based interface is now default
-    if (config.chk_sat_solver("minisat")) {
-      solver = (SATSolverWrapper*) new Minisat22WrapperGrpIncr(imgr);
-    } else if (config.chk_sat_solver("minisats")) {
-      solver = (SATSolverWrapper*) new Minisat22SWrapperGrpIncr(imgr);
+  if (config.get_incr_mode()) { // in incremental mode
+    _solver = new SATSolverWrapperGrpIncr(_imgr, _ll_fact.instance_ref(config));
+  } else {
+    if (config.get_sls_mode()) {
+      _solver = new SATSolverWrapperGrpSLS(_imgr, _sls_fact.instance_ref(config));
     } else {
-      tool_abort("Selection of invalid incremental SAT solver in factory");
+      _solver = new SATSolverWrapperGrpNonIncr(_imgr, _llni_fact.instance_ref(config));
     }
   }
-  if (solver == NULL)
-    tool_abort("Selection of invalid SAT solver in factory");
-  solver->set_verbosity(config.get_verbosity());
-  return *solver;
+  if (_solver == nullptr)
+    tool_abort("invalid SAT solver configuration in group solver factory");
+  _solver->set_verbosity(config.get_verbosity());
+  return *_solver;
 }

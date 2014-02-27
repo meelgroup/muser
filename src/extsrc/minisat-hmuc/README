@@ -1,0 +1,59 @@
+
+This directory contains the BOLT integration of Vadim Ryvchin's proof-tracing 
+version of minisat, implemented as part of Haifa-MUC MUS extractor described 
+in [1].
+
+[1] Vadim Ryvchin, Ofer Strichman: Faster Extraction of High-Level Minimal Unsatisfiable Cores. SAT 2011: 174-187
+
+
+Towards the future automation of the process, here's the record of steps:
+
+1. Get rid of all Main.cc files, and all original makefiles.
+
+2. Put BOLT makefiles (e.g. copy from minisat22)
+
+3. Replace namespace Minisat with some other one. I did it in Eclipse, but I think one can do it by
+replacing "namespace Minisat" with "namespace MinisatXXX" and replacing "Minisat::" with "MinisatXXX::"
+everywhere (e.g. with sed -i 's/namespace Minisat/namespace MinisatXXX/g' *.*)
+
+4. Add 
+
+#define __STDC_FORMAT_MACROS
+#define __STDC_LIMIT_MACROS
+
+to mtl/IntTypes.h after 
+
+#define Minisat_IntTypes_h
+
+These macros are needed to allow the extensions to formatting and numeric limits.
+
+5. Optional: add 
+
+#pragma GCC diagnostic ignored "-Wparentheses"
+
+to the top of mtl/IntTypes.h. This file is a good place to do this, since its included from any other file
+either directly or indirectly.
+
+6. If compiling with -std=c++11, then in utils/Options.h add space between a string literal and PRIi64 in
+fprintf statements (3 places):
+
+e.g. replace fprintf(stderr, "%4"PRIi64, range.begin); by fprintf(stderr, "%4" PRIi64, range.begin);
+
+7. Replace the header guards like
+
+#ifndef Minisat_SimpSolver_h
+#define Minisat_SimpSolver_h
+
+#endif
+
+with 
+
+#pragma once
+
+or use unique name accross BOLT. This is to avoid errors if including various versions of minisat.
+
+
+author: Anton Belov, May 2013
+
+
+

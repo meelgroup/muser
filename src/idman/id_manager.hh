@@ -29,7 +29,7 @@ public:
 
   IDManager() : id_count(0), min_id(1) { }
 
-  ~IDManager() { }
+  virtual ~IDManager() { }
 
 public:
   inline ULINT new_id() { return ++id_count; }

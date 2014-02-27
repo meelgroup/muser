@@ -18,7 +18,9 @@
 #include "mus_config.hh"
 #include "mus_data.hh"
 #include "sat_checker.hh"
+#include "test_irr.hh"
 #include "test_mus.hh"
+#include "test_vmus.hh"
 #include "worker.hh"
 
 /*----------------------------------------------------------------------------*\
@@ -50,6 +52,14 @@ public:
   /* Handles the TestMUS work item -- tests (group)MUS for correctness.
    */
   virtual bool process(TestMUS& tm);
+
+  /* Handles the TestIrr work item -- tests irrendant subformulas for correctness.
+   */
+  virtual bool process(TestIrr& ti);
+
+  /* Handles the TestVMUS work iterm -- test VMUS for correctness. 
+   */
+  virtual bool process(TestVMUS& tm);
 
 protected:
   

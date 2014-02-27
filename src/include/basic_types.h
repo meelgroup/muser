@@ -8,38 +8,32 @@
  * 
  * Revision:    $Id$.
  *
- *                                     Copyright (c) 2009, Joao Marques-Silva
+ *                        Copyright (c) 2009-13, Joao Marques-Silva, Anton Belov
 \*----------------------------------------------------------------------------*/
 //jpms:ec
 
 #ifndef _BASIC_TYPES_H
 #define _BASIC_TYPES_H 1
 
+#include <cstdint>
 
 /*----------------------------------------------------------------------------*\
  * Values besides 0 and 1
 \*----------------------------------------------------------------------------*/
 
-#ifdef __LP64__
-typedef unsigned long long int ULINT;
-typedef long long int LINT;
-#define MAXLINT LLONG_MAX;
-#define MINLINT LLONG_MIN;
-#define MAXULINT ULLONG_MAX;
-#else
-typedef unsigned long int ULINT;
-typedef long int LINT;
-#define MAXLINT LONG_MAX;
-#define MINLINT LONG_MIN;
-#define MAXULINT ULONG_MAX;
-#endif
+// 32-bit integers
+typedef uint32_t ULINT;
+typedef int32_t LINT;
+#define MAXLINT INT32_MAX
+#define MINLINT INT32_MIN
+#define MAXULINT UINT32_MAX
 
 #ifdef GMPDEF
 #include <gmpxx.h>
 typedef mpz_class XLINT;
 #define ToLint(x) x.get_si()
 #else
-typedef LINT XLINT;
+typedef int64_t XLINT;
 #define ToLint(x) (LINT)x
 #endif
 

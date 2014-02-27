@@ -30,6 +30,10 @@ using namespace __gnu_cxx;    // Required for STL hash extensions
 #include "cl_functors.hh"
 #include "cl_types.hh"
 
+// if CLRG_CACHE_LITS is defined, the literal vectors are stored and looked up in
+// the registry, when new clauses are added; this prevents dublicate clauses, but
+// might be expensive in some applications. This is the original behaviour.
+#define CLRG_CACHE_LITS
 
 //jpms:bc
 /*----------------------------------------------------------------------------*\
@@ -57,12 +61,20 @@ protected:
     c2n_map.clear();
   }
 
+public: // open up the interface so that clauses can be created directly
+
   BasicClause* create_clause(LINT nlits, const LINT lits[]) {
     vector<LINT> clits(lits, lits+nlits);
     sort(clits.begin(), clits.end(), AbsLitLess());
     remove_duplicates(clits);
-    BasicClause* ncl = lookup_vect(clits);
-    if (ncl != NULL) { return ncl; }
+    BasicClause* ncl = NULL;
+#ifdef CLRG_CACHE_LITS
+    ncl = lookup_vect(clits);
+    if (ncl != NULL) {
+      DBG(cout << "Clause already exists: "<<*ncl<<endl;);
+      return ncl;
+    }
+#endif
     ncl = new BasicClause(clits);
     register_clause(ncl);
     return ncl;
@@ -71,10 +83,14 @@ protected:
   BasicClause* create_clause(vector<LINT>& clits) {
     sort(clits.begin(), clits.end(), AbsLitLess());
     remove_duplicates(clits);
-    BasicClause* ncl = lookup_vect(clits);
+    BasicClause* ncl = NULL;
+#ifdef CLRG_CACHE_LITS
+    ncl = lookup_vect(clits);
     if (ncl != NULL) {
-      NDBG(cout << "Clause exists: " << *ncl << endl;);
-      return ncl; }
+      NDBG(cout << "Clause already exists: "<<*ncl<<endl;);
+      return ncl;
+    }
+#endif
     ncl = new BasicClause(clits);
     register_clause(ncl);
     return ncl;
@@ -99,43 +115,61 @@ protected:
   }
 
   void register_clause(BasicClause* ncl) {
+#ifdef CLRG_CACHE_LITS
     // Map from lit vect to cl
     vector<LINT>& lits = ncl->cl_lits();
     assert(v2p_map.find(&lits) == v2p_map.end());
     v2p_map.insert(make_pair(&lits, ncl));
+#endif
     // Map from cl to ref cnt
     LINT nclref = 0;
     c2n_map.insert(make_pair(ncl, nclref));
   }
 
   void add_literal(BasicClause* cl, LINT nlit) {
+#ifdef CLRG_CACHE_LITS
     CHK(ULINT mapsz = v2p_map.size(););
     vector<LINT>& clits = cl->cl_lits();
     v2p_map.erase(&clits);
+#endif
     cl->add_lit(nlit);
+#ifdef CLRG_CACHE_LITS
     vector<LINT>& nclits = cl->cl_lits();
     v2p_map.insert(make_pair(&nclits, cl));
     CHK(assert(mapsz == v2p_map.size()));
+#endif
   }
 
   void erase_clause(BasicClause* cl) {
     NDBG(cout << "Erasing clause: " << *cl << endl;);
+#ifdef CLRG_CACHE_LITS
     vector<LINT>& clits = cl->cl_lits();
     assert(v2p_map.find(&clits) != v2p_map.end());
     v2p_map.erase(&clits);
+#else
+    c2n_map.erase(cl); // this should probably be done regardless of CLRG_CACHE_LITS
+#endif
     delete cl;
   }
 
   BasicClause* lookup_vect(vector<LINT>& clits) {
+#ifdef CLRG_CACHE_LITS
     assert(is_sorted(clits.begin(), clits.end(), AbsLitLess()));
     iv2cl_iterator ippos = v2p_map.find(&clits);
     return (ippos != v2p_map.end()) ? ippos->second : NULL;
+#else
+    return NULL;
+#endif
   }
 
   BasicClause* lookup_vect(LINT num, const LINT ivect[]) {
+#ifdef CLRG_CACHE_LITS
     vector<LINT> clits(ivect, ivect+num);
     iv2cl_iterator ippos = v2p_map.find(&clits);
     return (ippos != v2p_map.end()) ? ippos->second : NULL;
+#else
+    return NULL;
+#endif
   }
 
 protected:
@@ -147,9 +181,7 @@ protected:
     unsigned int j = 1;
     for(; i<clits.size(); ++i) {
       assert(clits[i] != 0);
-      if (clits[i-1] != clits[i]) {
-	clits[j] = clits[i]; ++j;
-      }
+      if (clits[i-1] != clits[i]) { clits[j] = clits[i]; ++j; }
       CHK(else { std::cout << "Duplicate lit: " << clits[i] << endl; });
       CHK(if (clits[i-1] == -clits[i]) {
 	  std::cout<<"Vacuously SAT cl: ";PRINT_ELEMENTS(clits);cout<<endl;});

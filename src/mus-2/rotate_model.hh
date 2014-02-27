@@ -34,7 +34,7 @@ class RotateModel : public WorkItem {
 public:     // Lifecycle
 
   RotateModel(MUSData& md)
-    : _md(md), _pmodel(NULL), _owns_model(false), _collect_ft_gids(false) {}
+    : _md(md) {}
 
   virtual ~RotateModel(void) {
     if (_owns_model && _pmodel != NULL) delete _pmodel;
@@ -50,7 +50,8 @@ public:     // Parameters
 
   const IntVector& model(void) const { return *_pmodel; }
 
-  /* If make_copy is true will make its own copy of model.
+  /* If make_copy is true will make its own copy of model (might be useful for
+   * multithreaded environments)
    */
   void set_model(const IntVector& model, bool make_copy = false) {
     if (make_copy) {
@@ -72,8 +73,20 @@ public:     // Parameters
     }
   }
 
+  unsigned rot_depth(void) const { return _rot_depth; }
+  void set_rot_depth(unsigned rot_depth) { _rot_depth = rot_depth; }
+
+  unsigned rot_width(void) const { return _rot_width; }
+  void set_rot_width(unsigned rot_width) { _rot_width = rot_width; }
+
   bool collect_ft_gids(void) const { return _collect_ft_gids; }
   void set_collect_ft_gids(bool cf) { _collect_ft_gids = cf; }
+
+  bool ignore_g0(void) const { return _ignore_g0; }
+  void set_ignore_g0(bool ig0) { _ignore_g0 = ig0; }
+
+  bool ignore_global(void) const { return _ignore_global; }
+  void set_ignore_global(bool ig) { _ignore_global = ig; }
 
 public:     // Results
 
@@ -104,19 +117,28 @@ protected:
 
   MUSData& _md;                              // MUS data
 
-  GID _gid;                                  // the group to rotate
+  GID _gid = gid_Undef;                      // the group to rotate
 
-  IntVector* _pmodel;                        // pointer to model
+  IntVector* _pmodel = NULL;                 // pointer to model
 
-  bool _owns_model;                          // if true the model vector is owned
+  bool _owns_model = false;                  // if true the model vector is owned
 
-  bool _collect_ft_gids;                     // if true, collect "fasttrack" gids
+  unsigned _rot_depth = 1;                   // rotation depth
+
+  unsigned _rot_width = 1;                   // rotation width
+
+  bool _collect_ft_gids = false;             // if true, collect "fasttrack" gids
   
+  bool _ignore_g0 = false;                   // if true falsified clauses from g0 
+                                             // are ignored
+  bool _ignore_global = false;               // if true, globally known necessary
+                                             // groups are rotated through
+
   // results
 
   GIDSet _nec_gids;                          // GIDs of additional necessary groups
 
-  unsigned _version;                         // the version of MUSData this result is for
+  unsigned _version = 0;                     // the version of MUSData this result is for
 
   GIDSet _ft_gids;                           // GIDs of "fasttrack" groups
 

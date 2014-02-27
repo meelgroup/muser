@@ -2,7 +2,7 @@
  * File:        linear_scheduler.hh
  *
  * Description: Class declaration and implementation of a simple linear (largest
- *              to smallest gid) group scheduler.
+ *              to smallest gid) group scheduler. Not MT-safe.
  *
  * Author:      antonb
  * 
@@ -20,9 +20,12 @@
 /*----------------------------------------------------------------------------*\
  * Class:  LinearScheduler
  *
- * Purpose: Simple linear highest-to-lowest scheduler.
+ * Purpose: Simple linear highest-to-lowest scheduler for single-threaded 
+ *          environment.
  *
  * Notes:
+ *
+ *      1. IMPORTANT: not MT-safe (use LinearSchedulerMT if needed)
  *
 \*----------------------------------------------------------------------------*/
 
@@ -37,7 +40,7 @@ public:
     for (gset_iterator pg = md.gset().gbegin(); pg != md.gset().gend(); ++pg)
       if (*pg != 0) {
         (reverse) ? _q.push_back(*pg) : _q.push_front(*pg);
-  }
+      }
   }
 
   /** Returns true and sets the next group id for a given worker ID

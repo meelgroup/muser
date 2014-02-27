@@ -53,6 +53,7 @@ string convert(T val)
 #define DBGMACROS
 #define NDBG(x)
 #define NDBGPRT(x)
+#define NCHK(x)
 #ifdef FULLDEBUG
 #define DBG(x) x
 #define CDBG(v,x) if(v,=TRACEVERB) { x }
@@ -110,14 +111,22 @@ string convert(T val)
  * Logging utilities
 \*----------------------------------------------------------------------------*/
 
-//#define report(x) 
-
 #define read_cputime() RUSAGE::read_cpu_time()
 
 #define prt_std_cputime(x,y) \
   std::cout<<x<<y<<"CPU Time: "<<read_cputime()<<endl
 
 #define prt_cfg_cputime(y) prt_std_cputime(config.get_prefix(),y)
+
+#ifndef cout_pref
+#define cout_pref std::cout << config.get_prefix()
+#endif
+
+#ifndef report
+#define report(x) std::cout << config.get_prefix() << x << std::endl
+#define creport(x) cout << "c " << x << endl
+#endif
+
 
 #endif /* _MACROS_HH_ */
 

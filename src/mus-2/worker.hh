@@ -21,6 +21,10 @@
  * Purpose: Abstract base for all workers
  *
  * Notes: 
+ *      1. Workers are (typically) not MT-safe, however they should be designed 
+ * for use in MT environment, where by multiple instances of workers run side
+ * by side on multiple threads
+ * 
  *
 \*----------------------------------------------------------------------------*/
 

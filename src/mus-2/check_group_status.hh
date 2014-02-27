@@ -32,8 +32,7 @@ class CheckGroupStatus : public WorkItem {
 public:     // Lifecycle
 
   CheckGroupStatus(const MUSData& md, GID gid)
-    : _md(md), _gid(gid), _refine(false), _need_model(false), 
-      _use_rr(false), _status(false) {}
+    : _md(md), _gid(gid) {}
 
   virtual ~CheckGroupStatus(void) {};
 
@@ -57,6 +56,18 @@ public:     // Parameters
   bool use_rr(void) const { return _use_rr; }
   void set_use_rr(bool use_rr) { _use_rr = use_rr; }
 
+  /* If true, save the core as well */
+  bool save_core(void) const { return _save_core; }
+  void set_save_core(bool save_core) { _save_core = save_core; }
+
+  /* Conflict limit for this call; -1 = no limit */
+  LINT conf_limit(void) const { return _conf_limit; }
+  void set_conf_limit(LINT cl) { _conf_limit = cl; }
+
+  /* CPU limit for this call (secs); 0 = no limit */
+  float cpu_limit(void) const { return _cpu_limit; }
+  void set_cpu_limit(float cl) { _cpu_limit = cl; }
+
 public:     // Results
 
   /* True if necessary, false if not */
@@ -72,15 +83,27 @@ public:     // Results
   const IntVector& model(void) const { return _model; }
   IntVector& model(void) { return _model; }
 
+  /* Returns the version of MUSData the results are for - note that the 
+   * version is incremented whenever groups are removed from the group set */
+  const unsigned& version(void) const { return _version; }
+  void set_version(unsigned version) { _version = version; }
+
   /* If true, rr got in a way of refinement */
   const bool& tainted_core(void) const { return _tcore; }
   bool& tainted_core(void) { return _tcore; }
+
+  /* Returns a read-only pointer to the core (all the way into SAT solver),
+   * or nullptr if the outcome was SAT.
+   */
+  const GIDSet* pcore(void) { return &_core; }
+  void set_pcore(const GIDSet* pcore) {
+    _core.clear(); if (pcore != nullptr) _core = *pcore; } // TEMP slow !!!!
 
 public:     // Reset/recycle
 
   virtual void reset(void) {
     WorkItem::reset(); _status = false; _unnec_gids.clear();
-    _model.clear(); _tcore = false;
+    _model.clear(); _version = 0; _tcore = false;
   }
 
 protected:
@@ -91,21 +114,32 @@ protected:
 
   GID _gid;                                  // the group to test
 
-  bool _refine;                              // if true add refined GIDs
+  bool _refine = false;                      // if true add refined GIDs
 
-  bool _need_model;                          // if true save model if SAT
+  bool _need_model = false;                  // if true save model if SAT
 
-  bool _use_rr;                              // if true use redundancy removal trick
+  bool _use_rr = false;                      // if true use redundancy removal trick
+
+  bool _save_core = false;                   // if true, save the core as well
+
+  LINT _conf_limit = -1;                     // conflicts limit for this call
+
+  float _cpu_limit = 0.0f;                   // cpu limit for this call
 
   // results
 
-  bool _status;                              // true if SAT, false if not
+  bool _status = false;                      // true if SAT, false if not
 
   GIDSet _unnec_gids;                        // GIDs of unnecessary groups
 
   IntVector _model;                          // model (if SAT and asked for it)
 
+  unsigned _version;                         // the version of MUSData this result is for
+
   bool _tcore;                               // when true, rr got in a way of refinement
+
+  GIDSet _core;                              // TEMP: make direct access ! pointer to the most recent core
+                                             // or nullptr if outcome was SAT
 };
 
 #endif /* _CHECK_GROUP_STATUS_H */

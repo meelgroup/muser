@@ -66,11 +66,30 @@ Compilation options:
 make mkm=prof -- profiling build
 make mkm=val  -- optimized, with debug symbols
 make mkm=ass  -- optimized, with assertions enabled
-make mkm=chk  -- checked build
-make mkm=dbg  -- debug build
+make mkm=chk  -- checked build (code inside CHK(x) macros is compiled in)
+make mkm=dbg  -- non-optimized debug build (code in DBG(x) macros is compiled in)
 
-make static=1 -- build a statically linked executable
-make m32=1    -- build a 32-bit executable instead of 64-bit (not on Mac)
+make m32=1    -- build a 32-bit executable instead of 64-bit; you might need to
+                 add the path to 32-bit libraries to mkcfg/makefile-common-defs
+                 (around line 56).          
+                 Note: all ints are 32-bit always, so this only affects pointers,
+                 and has not been as thoroughly tested as the 64 bit compile.
+                 
+make xm=xp    -- compile all the experimental code, i.e. anything under
+                 #ifdef XPMODE in the source (use at your own risk)
+
+## NOTE: if you're running into weird problems it might be because there are 
+## symbols accross the static libraries. By default the linker will take the 
+## object code of the first one it sees and ignore the rest, and you will never 
+## know about it. Adding the code below, will make it to link in all of the
+## objects from each of the libraries, and so the linker will complain in case
+## there are dublicate symbols. 
+#ifeq (, $(findstring Darwin, $(UNAME)))
+#  LNKFLAGS += -Wl,--whole-archive $(LLIBDIRS) $(LLIBS) -Wl,--no-whole-archive
+#else
+#  LNKFLAGS += -Wl,-all_load $(LLIBDIRS) $(LLIBS)
+#endif
+
 
 ********************************************************************************
 Usage:

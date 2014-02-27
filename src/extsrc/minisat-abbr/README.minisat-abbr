@@ -1,0 +1,28 @@
+# Information about MINISATabr
+In the top of Solver.cc we found the following constant:
+ - LIT_REDUNDANT, 1 if we want to use clause minimization (0 otherwise)
+ - ADD_SELECTOR, 1 if we want to use our new clauses minimization (0 otherwise)
+ - GARBAGE_FINAL, 1 if we want to use the garbage collector in analyzeFinal (0 otherwise)
+
+# Script to easily collect information in log files
+recuperation.sh allow to collect the information in a log file (./recupInfoOne.sh logFile).
+The information are (in the order): 
+     - name of the instance 
+     - status (solved, timeout or outMem)
+     - running time
+     - memory consumption
+     - number of SAT calls
+     - size of the MUS
+     - sum of the size learned clause
+     - number of learned clauses
+     - average size of learned clauses
+     - number of literals replace by abbreviations
+     - number of abbreviation use
+     - average number of literals replace by abbreviation
+     - average number of abbreviation activates simultaneous
+     - maximum number of abbreviation activates simultaneous
+     - number of traversed literals during BCP (not often activated)
+
+recupAll.sh apply the previous script on a folder.
+
+

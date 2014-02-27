@@ -14,6 +14,7 @@
 #define _GLOBALS_HH_ 1
 
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <fstream>
 #include <cstddef>
@@ -22,6 +23,13 @@
 #include <climits>
 
 using namespace std;
+
+
+/*----------------------------------------------------------------------------*\
+ * System configuration
+\*----------------------------------------------------------------------------*/
+
+#include "config.hh"
 
 
 /*----------------------------------------------------------------------------*\
@@ -44,6 +52,13 @@ using namespace std;
 
 #include "basic_types.h"
 #include "types.hh"
+
+
+/*----------------------------------------------------------------------------*\
+ * Definition of functors used throughout
+\*----------------------------------------------------------------------------*/
+
+#include "functors.hh"
 
 
 /*----------------------------------------------------------------------------*\

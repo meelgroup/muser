@@ -18,7 +18,9 @@
  * Class:  GroupScheduler
  *
  * Purpose: An interface implemented by anyone who knows to schedule groups for 
- * execution for a given worker id.
+ * execution for a given worker id. Subclasses of GroupScheduler designed for 
+ * multi-threaded environments will be called by multiple threads simultaneously 
+ * (except constructor/descructor), and so are assumed to be thread-safe.
  *
  * Notes:
  *

@@ -14,15 +14,25 @@
  * 
  * Notes:
  *
- * 1. This implementation is designed primarily for GCNFs, as such normal CNFs 
+ * 1. This implementation is tailored and optimized for MUSer2. As a result many 
+ * (most) of the methods of BasicClauseSet are not implemented, and those that 
+ * are may assume certain usage scenario. When this is the case, the comments
+ * will (hopefully) indicate this.
+ *
+ * 2. This implementation is designed primarily for GCNFs, as such normal CNFs 
  * are treated as sets of single-clause groups with no group 0. Its plausible 
  * that a version of this class optimized for CNF will need to be created (TODO:
  * make sure to profile first, it might not be a big issue).
  *
- * 2. The implementation has been changed over from map-based to vector-based,
+ * 3. BasicGroupSet is *not* thread-safe, and does not do any locking by itself
+ *
+ * 4. At the moment it is a "read-only" object -- I will allow "fake removals"
+ * soon.
+ *
+ * 5. The implementation has been changed over from map-based to vector-based,
  * so some of the naming conventions are kept consisent with maps.
  *
- * 3. The clause pointers are dublicated -- one copy is in the vector of clauses
+ * 6. The clause pointers are dublicated -- one copy is in the vector of clauses
  * accessed via BasicGroupSet::begin() and BasicGroupSet::end() methods, while
  * the other copy is in the vector of clauses access through 
  * BasicClauseSet::gclauses() and gset_iterator::gclauses() method. This, of
@@ -30,12 +40,12 @@
  * with MUSer2 code I developed so far. Hopefully, at some point this will be
  * re-written (or not, but implemented property in "competition" versions).
  *
- * 4. The group-set has its own copy of ClauseRegistry -- i.e. not the static
+ * 7. The group-set has its own copy of ClauseRegistry -- i.e. not the static
  * one.
  *
  * Revision:    $Id$.
  *
- *                      Copyright (c) 2009-2011, Anton Belov, Joao Marques-Silva
+ *                       Copyright (c) 2009-2011, Anton Belov,Joao Marques-Silva
 \*----------------------------------------------------------------------------*/
 //jpms:ec
 
@@ -58,6 +68,7 @@
 #include "cl_registry.hh"
 #include "mus_config.hh"
 #include "occs_list.hh"
+
 
 /** Group ID to clause vector map */
 typedef std::map<GID, BasicClauseVector> GID2ClVMap;
@@ -104,7 +115,6 @@ public:
 typedef __gnu_cxx::hash_set<GID, IntHash, IntEqual> GIDHSet;
 typedef GIDHSet::iterator GIDHSetIterator;
 typedef GIDHSet::const_iterator GIDHSetCIterator;
-
 // output
 inline std::ostream& operator<<(std::ostream& out, const GIDHSet& gs) {
   out << "{ "; 
@@ -134,6 +144,9 @@ typedef std::list<GID> GIDList;
 typedef GIDList::iterator GIDListIterator;
 typedef GIDList::const_iterator GIDListCIterator;
 
+/** Vector of variables */
+typedef std::vector<ULINT> VarVector;
+
 /*----------------------------------------------------------------------------*\
  * Class: BasicGroupSet
  *
@@ -141,6 +154,12 @@ typedef GIDList::const_iterator GIDListCIterator;
  *
  * Notes: 
  *      1. See notes at the begining of this file.
+ *      2. With the introduction of VMUSes group set has an extra layer of
+ *      mapping from GIDs of variable groups to variables. When in VMUS mode
+ *      the occlist is contructed and used to get to the actual clauses; if
+ *      this becomes a problem, the access can be streamlined.
+ *      3. TODO: Iterator over GIDMap and VGIDMap is made into template, maybe
+ *      I should just make the map itself a template ? 
  *
 \*----------------------------------------------------------------------------*/
 
@@ -148,12 +167,21 @@ class BasicGroupSet {
 
 protected:      // Some internal types
 
+  // info for groups of clauses
   struct GroupInfo {
     BasicClauseVector content;   // all clauses for this group
     ULINT a_count;               // the number of active clauses in the group
     GroupInfo(void) : a_count(0) {}
   };
-  typedef std::vector<GroupInfo*> GIDMap;       // where everything is
+  typedef std::vector<GroupInfo*> GIDMap;   // where everything is; index = gid
+
+  // info for groups of variables
+  struct VGroupInfo {
+    VarVector content;           // all variables for this group
+    ULINT a_count;               // the number of active variables in the group
+    VGroupInfo(void) : a_count(0) {}
+  };
+  typedef std::vector<VGroupInfo*> VGIDMap; // where everything is; index = gid
 
   /* Iterator over a group map, i.e. vector of pointers indexed by GID that 
    * contains NULL pointer for empty groups, and otherwise a structure that
@@ -224,20 +252,26 @@ protected:      // Some internal types
 public:         // Lifecycle
 
   /* Default contructor - does not try to optimize, no occs_list */
-  BasicGroupSet(void) :
-    _gmap((size_t)1, NULL), _max_gid(0), _max_var(0), _max_id(0), _size(0), _gsize(0), 
-    _mode(0), _poccs_list(NULL), _empty(NULL) 
-  {}
+  BasicGroupSet(void) 
+    : _gmap((size_t)1, NULL) {}
 
   /* Looks into configuration settings, and sets various optimization parameters
    * based on the configuration */
-  BasicGroupSet(ToolConfig& config) :
-    _gmap((size_t)1, NULL), _max_gid(0), _max_var(0), _max_id(0), _size(0), _gsize(0),
-    _empty(NULL) {
+  BasicGroupSet(ToolConfig& config) 
+    : _gmap((size_t)1, NULL) {
     // mode: CNF or GCNF
     _mode = (config.get_grp_mode() ? 2 : 1);
     // occs list is needed for BCP, BCE and for model rotation
-    _poccs_list = config.get_model_rotate_mode() ? new OccsList() : NULL;
+    _poccs_list = 
+      (config.get_model_rotate_mode() 
+       || config.get_bcp_mode() 
+       || config.get_bce_mode()
+       || config.get_ve_mode()
+       || config.get_var_mode()) ? new OccsList() : NULL;
+    // units are needed for BCP and VE
+    _store_units = config.get_bcp_mode() || config.get_ve_mode();
+    // variable maps needed for the VMUS (and similar) modes
+    _make_vgmap = (!config.get_var_mode()) ? 0 : (config.get_grp_mode() ? 2 : 1);
   }    
 
   virtual ~BasicGroupSet(void) {
@@ -269,7 +303,15 @@ public:         // Lifecycle
       delete _poccs_list;
       _poccs_list = new OccsList();
     }
+    // _store_units = false; keep this flag also
+    _units.clear();
     _empty = 0;
+    // _make_vgmap = 0; keep the mode
+    _vgmap.clear();
+    _rvgmap.clear();
+    _max_vgid = 0;
+    _vgsize = 0;
+    _vsize = 0;
   }
   
 public:    // Info
@@ -280,6 +322,9 @@ public:    // Info
   /* Returns the maximum among group IDs */
   GID max_gid(void) const { return _max_gid; }
 
+  /* Returns the maximum among variable group IDs */
+  GID max_vgid(void) const { return _max_vgid; }
+
   /* Returns the maximum clause ID */
   ULINT max_id(void) const { return _max_id; }
 
@@ -288,6 +333,12 @@ public:    // Info
 
   /* Returns the number of groups */
   ULINT gsize(void) const { return _gsize; }
+
+  /* Returns the number of variable groups (>= 1; 0 if not in var mode) */
+  ULINT vgsize(void) const { return _vgsize; }
+
+  /* Returns the actual number of variables (0 if not in var mode) */
+  ULINT vsize(void) const { return _vsize; }
 
   /* Stores/retrieves initial sizes (for convenience only) */
   void set_init_size(ULINT init_size) { _init_size = init_size; }
@@ -353,6 +404,27 @@ public:    // Creation and addition of clauses (note that create_clause is used
         if (has_occs_list())
           _poccs_list->resize(_max_var);
       }
+      // if default _vgmap is needed, add the variables of the clause to the 
+      // _vgmap; for the default map VGID = variable id
+      if (_make_vgmap == 1) {
+        if (_max_vgid < _max_var) {
+          _max_vgid = _max_var;
+          _vgmap.resize(_max_vgid + 1, 0);
+          _rvgmap.resize(_max_var + 1, gid_Undef);
+        }
+        for (CLiterator plit = cl->abegin(); plit != cl->aend(); ++plit) {
+          ULINT var = abs(*plit);
+          if (_vgmap[var] == NULL) {
+            VGroupInfo* vgi = new VGroupInfo();
+            vgi->content.push_back(var);
+            vgi->a_count = 1;
+            _vgmap[var] = vgi;
+            _rvgmap[var] = (GID)var; // default group ID = variable ID
+            _vgsize++; // new group
+            _vsize++; // new var
+          }
+        }
+      }
     } else {
       _empty = cl;
     }
@@ -364,6 +436,8 @@ public:    // Creation and addition of clauses (note that create_clause is used
         ++(_poccs_list->active_size(*lpos));
       }
     }
+    if (_store_units && cl->size() == 1) // remember units
+      _units.push_back(cl);
     _clreg.register_clause(cl);
     return cl;
   }
@@ -447,7 +521,7 @@ public:    // Access to clauses
   cvec_iterator end(void) { return _clvec.end(); }
   cvec_citerator end(void) const { return _clvec.end(); }
 
-public:    // Access to non-empty groups - via custom iterator
+public:    // Access to non-empty groups of clauses - via custom iterator
 
   typedef gmap_iter_tmpl<GIDMap, BasicClauseVector> gset_iterator;
 
@@ -460,6 +534,9 @@ public:    // Access to non-empty groups - via custom iterator
   /* True if the group is a non-empty group in the group set
    */
   bool gexists(GID gid) const { return (gid <= _max_gid) && (_gmap[gid] != NULL); }
+
+  /* Returns true if the group set has g0 */
+  bool has_g0(void) const { return gexists(0); }
 
   /* Returns a reference to the vector of clauses for the specified group ID, 
    * throws std::out_of_range if group ID does not exist
@@ -498,6 +575,63 @@ public:  // Access to occurences lists
     }
   }
 
+public:    // Access to non-empty groups of variables
+
+  /* Sets the group id of variable -- this only supposed to happen in group 
+   * variable mode. TODO: should we allow same variable in different group ? 
+   */
+  void set_var_grp_id(ULINT var, GID vgid) {
+    // make it a hard error for now
+    if (_make_vgmap != 2) 
+      throw std::logic_error("BasicGroupSet::set_var_grp_id() is used inappropriately.");
+    if (_max_vgid <= vgid) {
+      _max_vgid = vgid;
+      _vgmap.resize(_max_vgid + 1, NULL);
+    }
+    if (_vgmap[vgid] == NULL) {
+      _vgmap[vgid] = new VGroupInfo();
+      _vgsize++; // new group
+    }
+    _vgmap[vgid]->content.push_back(var);
+    _vgmap[vgid]->a_count++;
+    if (_rvgmap.size() < var + 1)
+      _rvgmap.resize(std::max(var,_max_var) + 1, gid_Undef);
+    if (_rvgmap[var] == gid_Undef)
+      _vsize++; // new var
+    _rvgmap[var] = vgid;
+  }
+
+  /* Returns the variable group ID of variable 
+   */
+  GID get_var_grp_id(ULINT var) { assert(_make_vgmap >= 1); return _rvgmap[var]; }
+
+  typedef gmap_iter_tmpl<VGIDMap, VarVector> vgset_iterator;
+
+  /* Iterator to the first non-empty group */
+  vgset_iterator vgbegin(void) { return vgset_iterator(_vgmap, _vgmap.begin()); }
+
+  /* Iterator past the last non-empty group */
+  vgset_iterator vgend(void) { return vgset_iterator(_vgmap, _vgmap.end()); }
+
+  /* True if the group is a non-empty group in the group set
+   */
+  bool vgexists(GID vgid) const { 
+    return (vgid <= _max_vgid) && (_vgmap[vgid] != NULL); 
+  }
+
+  /* Returns a reference to the vector of variables for the specified group ID, 
+   * throws std::out_of_range if group ID does not exist
+   */
+  VarVector& vgvars(GID vgid) {
+    VGroupInfo* pgi = NULL;
+    if ((vgid > _max_vgid) || ((pgi = _vgmap[vgid]) == NULL))
+      throw std::out_of_range("non-existent group");
+    return pgi->content;
+  }
+  const VarVector& vgvars(GID vgid) const { 
+    return const_cast<BasicGroupSet*>(this)->vgvars(vgid); 
+  }
+
 public:  // Access to unit and empty clauses
 
   BasicClauseVector& units(void) { return _units; }
@@ -511,6 +645,8 @@ public:  // Methods called from parsers to pass on the info from input files
   void set_num_vars(ULINT nvars) { 
     if (has_occs_list())
       _poccs_list->init(nvars);
+    if (_make_vgmap) 
+      _rvgmap.reserve(nvars+1);
   }
 
   void set_num_cls(ULINT ncls) {        // reserve space
@@ -524,6 +660,11 @@ public:  // Methods called from parsers to pass on the info from input files
   void set_num_grp(XLINT ngrp) {        // reserve space
     if (_mode == 2)
       _gmap.reserve(ngrp+1);
+  }
+  
+  void set_num_vgrp(ULINT nvgrp) {       // reserve space
+    if (_make_vgmap)
+      _vgmap.reserve(nvgrp+1);
   }
 
 public:    // Output functions
@@ -540,12 +681,30 @@ public:    // Output functions
       out << std::endl;
       _poccs_list->dump(out);
     }
+    if (_make_vgmap) {
+      out << "Variable group map:" << std::endl;
+      for (vgset_iterator pvg = ths->vgbegin(); pvg != ths->vgend(); ++pvg) {
+        out << "[vgid=" << *pvg << "]: vars={ ";
+        copy(pvg.vgvars().begin(), pvg.vgvars().end(), 
+             std::ostream_iterator<ULINT, char>(out, " "));
+        out << "}" << std::endl;
+      }
+    }
   }
 
   friend std::ostream& operator<< (std::ostream& out, const BasicGroupSet& gs) {
     gs.dump(out);
     return out;
   }
+
+
+public:    // Additions for the proof-checker instances
+
+  ULINT get_first_abbr(void) const { return _first_abbr; }
+  void set_first_abbr(ULINT fa) { _first_abbr = fa; }
+
+  ULINT get_first_sel(void) const { return _first_sel; }
+  void set_first_sel(ULINT fs) { _first_sel = fs; }
 
 protected:
 
@@ -555,32 +714,51 @@ protected:
 
   GIDMap _gmap;            // index = GID, value = GroupInfo (vector of clauses + ...)
 
-  GID _max_gid;            // maximum GID
+  GID _max_gid = 0;        // maximum GID
 
-  ULINT _max_var;          // maximum variable ID
+  ULINT _max_var = 0;      // maximum variable ID
 
-  ULINT _max_id;           // maximum clause ID
+  ULINT _max_id = 0;       // maximum clause ID
 
-  ULINT _size;             // number of clauses
-  ULINT _init_size;        // -"- initial
+  ULINT _size = 0;         // number of clauses
+  ULINT _init_size = 0;    // -"- initial
 
-  ULINT _gsize;            // number of groups
-  ULINT _init_gsize;       // -"- initial
+  ULINT _gsize = 0;        // number of groups
+  ULINT _init_gsize = 0;   // -"- initial
 
-  int   _mode;             // used for optimizations: 0 = unknown, 1 = CNF, 2 = GCNF
+  int _mode = 0;           // used for optimizations: 0 = unknown, 1 = CNF, 2 = GCNF
 
-  OccsList* _poccs_list;   // created and populated if needed
+  OccsList* _poccs_list = 0;// created and populated if needed
+
+  bool _store_units = false;// if true, makes a list of unit clauses
 
   BasicClauseVector _units;// the list of unit clauses
 
   BasicClause* _empty;     // empty clause (if there)
 
+  unsigned _make_vgmap = 0;// 0 - no map, 1 - default map (i.e. vgid = var id), 
+                           // 2 - custom map
+
+  VGIDMap _vgmap;          // index = GID, value = vector of vars
+
+  GIDVector _rvgmap;       // reverse map: index = var, value = GID
+
+  GID _max_vgid = 0;       // maximum variable group GID
+
+  ULINT _vgsize = 0;       // number of variable groups
+
+  ULINT _vsize = 0;        // number of variables
+
+  ULINT _first_abbr = 0;    // for proof-checker based instances
+
+  ULINT _first_sel = 0;    // for proof-checker based instances
 };
 
 
-/** Iterator typedefs -- for backward compatibility
+/** Iterator typedefs -- for backward compatibility and convenience
  */
-typedef BasicGroupSet::gset_iterator gset_iterator;     // groups
+typedef BasicGroupSet::gset_iterator gset_iterator;     // groups of clauses
+typedef BasicGroupSet::vgset_iterator vgset_iterator;   // groups of variables
 
 #endif /* _BASIC_GROUP_SET_H */
 

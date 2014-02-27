@@ -40,7 +40,7 @@ public:     // Lifecycle
    * note that gid is expected to be included in the chunk
    */
   CheckRangeStatus(const MUSData& md)
-    : _md(md), _refine(false), _need_model(false), _status(false) {}
+    : _md(md) {}
 
   virtual ~CheckRangeStatus(void) {};
 
@@ -66,9 +66,12 @@ public:     // Parameters
   void set_refine(bool refine) { _refine = refine; }
 
   /* If true, then in case some of the groups in the subset are necessary, get
-   * the witness (the model of the remainder */
+   * the witness (the model of the remainder); if p_model != nullptr the model 
+   * will be saved into the vector pointed by p_model
+   */
   bool need_model(void) const { return _need_model; }
-  void set_need_model(bool need_model) { _need_model = need_model; }
+  void set_need_model(bool need_model, IntVector* p_model = nullptr) { 
+    _need_model = need_model; _p_model = p_model; }
   
   /* If true, the negation of [end(),allend()) is added prior to the SAT
    * check -- this is used in redundancy removal mode. */
@@ -87,8 +90,8 @@ public:     // Results
   GIDSet& unnec_gids(void) { return _unnec_gids; }
 
   /* If nesessary and need_model() is true, this will refer to the model */
-  const IntVector& model(void) const { return _model; }
-  IntVector& model(void) { return _model; }
+  const IntVector& model(void) const { return this->model(); }
+  IntVector& model(void) { return (_p_model == nullptr) ? _model : *_p_model; }
 
   /* Returns the version of MUSData the results are for - note that the 
    * version is incremented whenever groups are removed from the group set */
@@ -99,7 +102,7 @@ public:     // Reset/recycle
 
   virtual void reset(void) {
     WorkItem::reset(); _status = false; _unnec_gids.clear();
-    _model.clear(); _version = 0; 
+    model().clear(); _version = 0; 
   }
 
 protected:
@@ -114,23 +117,25 @@ protected:
 
   GIDVector::const_iterator _pallend;        // iterator past the end of all GIDs
    
-  bool _refine;                              // if true add refined GIDs
+  bool _refine = false;                      // if true add refined GIDs
 
-  bool _need_model;                          // if true save model if SAT
+  bool _need_model = false;                  // if true save model if SAT
 
-  bool _add_negation;                        // if true, add negation of [_pend, p_allend]
+  bool _add_negation = false;                // if true, add negation of [_pend, p_allend]
                                              // prior to SAT check (for redundancy removal)
 
   // results
 
-  bool _status;                              // true if SAT, false if not
+  bool _status = false;                      // true if SAT, false if not
 
   GIDSet _unnec_gids;                        // GIDs of unnecessary groups among
                                              // those in the range
 
   IntVector _model;                          // model (if SAT and asked for it)
 
-  unsigned _version;                         // the version of MUSData this result is for
+  IntVector* _p_model = nullptr;             // or this one for the model
+
+  unsigned _version = 0;                     // the version of MUSData this result is for
 
 };
 

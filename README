@@ -1,14 +1,15 @@
 ********************************************************************************
-MUSer2 (MUS extractor v2): an MUS and group-MUS extraction tool.
-----------------------------------------------------------------
+MUSer2: a grown-up MUS extractor
+--------------------------------
 
-MUSer2 is an MUS/group-MUS/MES/group-MES/VMUS/VGMUS extraction framework that
-implements many different algorithms for the computation of the above, and is
-designed for (relative) ease of trying out and experimenting with new ideas. 
+Born as an MUS extractor, MUSer2 is now a MUS/group-MUS/MES/group-MES/VMUS/VGMUS
+extraction framework that implements many different algorithms for the 
+computation of the above, and is designed for (relative) ease of trying out and 
+experimenting with new ideas. 
 
 The list of references at the end of this README provides pointers to the 
 descriptions of various algorithms and techniques used in MUSer2. Please cite 
-[X] if you use MUSer2 in your research work.
+[1] if you use MUSer2 in your research work.
 
 This source code release is under the GNU General Public License Version 3. See 
 COPYING for more details. In essence you are only allowed to distribute a 
@@ -164,22 +165,22 @@ questions.
 ********************************************************************************
 MUSer2 REFERENCES
 
-[1] A. Belov and J. Marques-Silva, “MUSer2 : An Efficient MUS Extractor, System 
-    Description,” JSAT, 2012. 
+[1] A. Belov and J. Marques-Silva, "MUSer2 : An Efficient MUS Extractor, System 
+    Description", JSAT, 2012. 
     * this is the tool paper for MUSer2.    
-[2] A. Belov, I. Lynce, and J. Marques-Silva, “Towards efficient MUS extraction”
+[2] A. Belov, I. Lynce, and J. Marques-Silva, "Towards efficient MUS extraction"
     AI Commun., 2012.
     * hybrid algorithm, recursive model rotation
-[3] A. Belov, A. Ivrii, A. Matsliah, and J. Marques-silva, “On Efficient 
-    Computation of Variable MUSes,” SAT-2012, 2012.
+[3] A. Belov, A. Ivrii, A. Matsliah, and J. Marques-silva, "On Efficient 
+    Computation of Variable MUSes", SAT-2012, 2012.
     * variable MUSes
-[4] A. Belov, M. Janota, I. Lynce, and J. Marques-Silva, “On Computing Minimal 
-    Equivalent Subformulas,” in CP-12, 2012, pp. 1–17.
+[4] A. Belov, M. Janota, I. Lynce, and J. Marques-Silva, "On Computing Minimal 
+    Equivalent Subformulas," in CP-12, 2012, pp. 1-17.
     * MESes
-[5] J. Marques-Silva, M. Janota, and A. Belov, “Minimal Sets over Monotone 
-    Predicates in Boolean Formulae,” in CAV-2013, pp. 1–16.
+[5] J. Marques-Silva, M. Janota, and A. Belov, "Minimal Sets over Monotone 
+    Predicates in Boolean Formulae," in CAV-2013, pp. 1-16.
     * progression-based algorithm
-[6] A. Belov, M. Järvisalo, and J. Marques-Silva, “Formula preprocessing in MUS 
-    extraction,” TACAS 2013, pp. 1–15, 2013.
+[6] A. Belov, M. Jarvisalo, and J. Marques-Silva, "Formula preprocessing in MUS 
+    extraction," TACAS 2013, pp. 1-15, 2013.
     * preprocessing
     

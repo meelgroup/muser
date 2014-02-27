@@ -21,7 +21,8 @@ EXTINCS = minisat-abbr # this solver needs special configuation
 endif
 PARSEINCS = chkfmt cnffmt gcnffmt vgcnffmt
 
-LIBS = clset mus-2 wraps-2 wraps
+# order matters here (keep clset last) because of static libs
+LIBS = mus-2 wraps-2 wraps clset
 
 LFLAGS = -lz
 

@@ -2,7 +2,6 @@
 ##
 ## Author:   jpms, antonb
 ##
-## Note: make sure to pass extras=1 on command line
 ##
 
 #-------------------------------------------------------------------------------

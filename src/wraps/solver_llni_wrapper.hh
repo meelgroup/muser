@@ -5,7 +5,7 @@
  * Description: low-level non-incremental interface to SAT solver
  *
  * Author:      antonb
- * 
+ *
  *                                              Copyright (c) 2013, Anton Belov
 \*----------------------------------------------------------------------------*/
 //jpms:ec
@@ -13,6 +13,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <functional>
 #include "globals.hh"
 #include "id_manager.hh"
 #include "basic_clset.hh"

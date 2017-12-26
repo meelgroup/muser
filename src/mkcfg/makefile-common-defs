@@ -226,6 +226,12 @@ endif
 endif
 endif
 
+# In case we use IPASIR, extend CPPFLAGS and LNKFLAGS
+ifneq ($(IPASIR_LIB),)
+CPPFLAGS += -D IPASIR_LIB=$(IPASIR_LIB)
+LNKFLAGS += $(IPASIR_LIB) $(IPASIR_LIBS)
+endif
+
 #-------------------------------------------------------------------------------
 # Re-make an executable without checking libraries etc.
 #-------------------------------------------------------------------------------

@@ -19,6 +19,10 @@
 #include "glucose30_ll_wrapper.hh"
 #include "lingeling_ll_wrapper.hh"
 
+#ifdef IPASIR_LIB // use only if we currently compile against IPASIR
+#include "IPASIR_ll_wrapper.hh"
+#endif
+
 /** Implementation of the factory method */
 SATSolverLowLevelWrapper* SATSolverLLFactory::instance_ptr(SATSolverConfig& config) 
 {
@@ -46,6 +50,10 @@ SATSolverLowLevelWrapper* SATSolverLLFactory::instance_ptr(SATSolverConfig& conf
     solver = (SATSolverLowLevelWrapper*) new Glucose30sLowLevelWrapper(imgr);
   } else if (config.chk_sat_solver("lingeling")) {
     solver = (SATSolverLowLevelWrapper*) new LingelingLowLevelWrapper(imgr);
+#ifdef IPASIR_LIB
+  } else if (config.chk_sat_solver("ipasir")) {
+    solver = (SATSolverLowLevelWrapper*) new IPASIRLowLevelWrapper(imgr);
+#endif
   } else {
     tool_abort("Invalid SAT solver selection in factory: unsupported solver");
   }

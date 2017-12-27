@@ -451,6 +451,7 @@ int main(int argc, char** argv)
 "  -minisat-abbr use the abbreviating version of minisat (incr. only) [Lagniez, Biere, SAT-2013] [default: off]\n" \
 "  -lingeling use the lingeling-ala solver (incr. only) [default: off] \n" \
 "  -picosat935 use the picosat-935 SAT solver [default: off] \n" \
+"  -ipasir use the attached IPASIR solver library (if compiled in) [default: off] \n" \
 "  -ubcsat12 use UBCSAT 1.2 solver; if set, make sure to set approximation mode [default: off] \n" \
 " Proof-compactor:\n" \
 "  -pc       assume that the input formula is an output of Marijn's proof compactor [default: off]\n" \
@@ -560,6 +561,9 @@ namespace {
       else if (!strcmp(argv[i], "-minisat-abbr")) {cfg.set_sat_solver("minisat-abbr");}
       else if (!strcmp(argv[i], "-lingeling")) {cfg.set_sat_solver("lingeling");}
       else if (!strcmp(argv[i], "-picosat935")) {cfg.set_sat_solver("picosat935");}
+#ifdef IPASIR_LIB
+      else if (!strcmp(argv[i], "-ipasir")) {cfg.set_sat_solver("ipasir");}
+#endif
       else if (!strcmp(argv[i], "-ubcsat12")) {cfg.set_sat_solver("ubcsat12"); cfg.set_sls_mode(); cfg.unset_incr_mode(); }
       else if (!strcmp(argv[i], "-rwidth")) {++i; cfg.set_rotation_width(atoi(argv[i]));}
       else if (!strcmp(argv[i], "-intelmr")) { cfg.set_intelmr_mode(); }
